@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+  <driver id="solaredge">
+    <name>SolarEdge</name>
+    <description><![CDATA[
+        This driver provides a skeleton to help developers start.
+      ]]>
+    </description>
+    
+    <deviceAddress>
+      <option id="address">
+        <name>Address</name>
+        <description><![CDATA[
+            The address that is necessary for the device to work.
+          ]]>
+        </description>
+        <mandatory>true</mandatory>
+        <type>STRING</type>
+      </option>
+    </deviceAddress>
+    
+    <channelAddress>
+      <syntax>
+        <keyValue>false</keyValue>
+      </syntax>
+      <option id="foo">
+        <name>Foo</name>
+        <description><![CDATA[
+            The unique key, identifying the type of information that should be read.
+          ]]>
+        </description>
+        <mandatory>true</mandatory>
+        <type>STRING</type>
+      </option>
+    </channelAddress>
+    
+    <channelSettings>
+      <option id="bar">
+        <name>Bar</name>
+        <description><![CDATA[
+            Some optional integer, to further configure the channel
+          ]]>
+        </description>
+        <type>INTEGER</type>
+        <selection>
+          <item value="1">Integer 1</item>
+          <item value="2">Integer 2</item>
+        </selection>
+        <default>1</default>
+      </option>
+    </channelSettings>
+  </driver>
+</configuration>

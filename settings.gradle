@@ -1,0 +1,5 @@
+include "solaredge", "openmuc-driver-solaredge"
+
+project(":solaredge").projectDir = file("projects/solaredge")
+
+project(":openmuc-driver-solaredge").projectDir = file("projects/openmuc-driver")
