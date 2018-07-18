@@ -1,69 +1,80 @@
-/*
- * Copyright 2016-18 ISC Konstanz
- *
- * This file is part of OpenSkeleton.
- * For more information visit https://github.com/isc-konstanz/OpenSkeleton.
- *
- * OpenSkeleton is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OpenSkeleton is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenSkeleton.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
 package org.openmuc.framework.driver.solaredge;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.openmuc.framework.config.ArgumentSyntaxException;
 import org.openmuc.framework.config.DriverInfo;
 import org.openmuc.framework.config.DriverInfoFactory;
 import org.openmuc.framework.config.ScanException;
 import org.openmuc.framework.config.ScanInterruptedException;
+import org.openmuc.framework.driver.solaredge.SolarEdgeConnection.SolarEdgeConnectionCallbacks;
+import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
+import org.openmuc.framework.driver.solaredge.settings.DeviceSettings;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.DriverDeviceScanListener;
 import org.openmuc.framework.driver.spi.DriverService;
-import org.osgi.service.component.annotations.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openmuc.http.HttpHandler;
+import org.openmuc.solaredge.SolarEdgeConfig;
+import org.openmuc.solaredge.SolarEdgeHttpFactory;
 
-@Component
-public class SolarEdgeDriver implements DriverService {
-	private final static Logger logger = LoggerFactory.getLogger(SolarEdgeDriver.class);
+public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallbacks {
 
-    private final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+    private final static String ID = "SolarEdge";
+    private final static String DESCRIPTION = "This driver can be used to access SolarEdge devices";
 
+    public final DriverInfo driverInfo = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+
+	private final Map<Integer, SolarEdgeConnection> connectionsMap;
+	private HttpHandler httpHandler;
+
+	public SolarEdgeDriver() {
+		connectionsMap = new HashMap<Integer, SolarEdgeConnection>();
+	}
+	
 	@Override
-	public DriverInfo getInfo() {
-		return info;
+	public Connection connect(String addressStr, String settingsStr) throws ArgumentSyntaxException, ConnectionException {
+
+        DeviceAddress address = driverInfo.parse(addressStr, DeviceAddress.class);
+        DeviceSettings settings = driverInfo.parse(settingsStr, DeviceSettings.class);
+		
+		SolarEdgeConnection connection = connectionsMap.get(address.getSiteId());
+		
+		if (connection == null) {
+			SolarEdgeConfig config = new SolarEdgeConfig(address.getAddress(), settings.getAuthentication());				
+			httpHandler = SolarEdgeHttpFactory.newAuthenticatedConnection(config);
+
+			connection = new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
+			connectionsMap.put(address.getSiteId(), connection);
+			httpHandler.start();
+		}
+
+		return connection;
 	}
 
 	@Override
-	public void scanForDevices(String settings, DriverDeviceScanListener listener)
-			throws UnsupportedOperationException, ArgumentSyntaxException, ScanException, ScanInterruptedException {
-		
-		// TODO Implement your devices scan or remove the whole method
+	public DriverInfo getInfo() {
+		return driverInfo;
 	}
 
 	@Override
 	public void interruptDeviceScan() throws UnsupportedOperationException {
-
-		// TODO Implement your devices scan interrupt or remove the whole method
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
-	public Connection connect(String addressStr, String settingsStr) throws ArgumentSyntaxException, ConnectionException {
+	public void scanForDevices(String arg0, DriverDeviceScanListener arg1)
+			throws UnsupportedOperationException, ArgumentSyntaxException, ScanException, ScanInterruptedException {
+		// TODO Auto-generated method stub
 		
-		logger.info("Connect Skeleton device address \"{}\": {}", addressStr, settingsStr);
-		SolarEdgeConnection connection = new SolarEdgeConnection(addressStr, settingsStr);
-		
-        return connection;
+	}
+
+	@Override
+	public void onDisconnect(int siteId) {
+		httpHandler.stop();
+		connectionsMap.remove(siteId);
 	}
 
 }

@@ -1,10 +1,24 @@
+
+configurations.create('embed')
+
 dependencies {
-  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+  compile project(':openmuc-http')
+  embed project(':openmuc-http')
+  
+  testCompile project(':openmuc-http').sourceSets.test.output
 }
 
 jar {
   manifest {
     name = "OpenSolarEdge"
-    instruction 'Export-Package', '!*.internal.*,*'
+    instruction 'Bundle-ClassPath', '.,lib/openmuc-http-' + cfgVersion + '.jar'
+    instruction 'Import-Package', '!org.openmuc.http.*,*' + jarDefaultImportPackageVersion
+    instruction 'Export-Package', ''
+  }
+}
+
+jar {
+  into('lib') {
+    from configurations.embed
   }
 }

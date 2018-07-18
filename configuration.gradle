@@ -13,8 +13,9 @@ project.ext {
   jarDefaultImportPackageVersion = ";version=0"
 
   distributionProjects = subprojects.findAll {
+    it.getPath() == ":openmuc-driver-solaredge" ||
     it.getPath() == ":solaredge" ||
-    it.getPath() == ":openmuc-driver-solaredge"
+    it.getPath() == ":openmuc-http"    
   }
 
   docProjects = distributionProjects.findAll {

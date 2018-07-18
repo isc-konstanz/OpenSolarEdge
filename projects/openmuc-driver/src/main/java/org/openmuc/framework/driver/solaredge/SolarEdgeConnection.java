@@ -1,23 +1,3 @@
-/*
- * Copyright 2016-18 ISC Konstanz
- *
- * This file is part of OpenSkeleton.
- * For more information visit https://github.com/isc-konstanz/OpenSkeleton.
- *
- * OpenSkeleton is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * OpenSkeleton is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with OpenSkeleton.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
 package org.openmuc.framework.driver.solaredge;
 
 import java.util.List;
@@ -27,90 +7,158 @@ import org.openmuc.framework.config.ChannelScanInfo;
 import org.openmuc.framework.config.DriverInfoFactory;
 import org.openmuc.framework.config.DriverPreferences;
 import org.openmuc.framework.config.ScanException;
+import org.openmuc.framework.data.BooleanValue;
+import org.openmuc.framework.data.ByteArrayValue;
+import org.openmuc.framework.data.ByteValue;
 import org.openmuc.framework.data.DoubleValue;
 import org.openmuc.framework.data.Flag;
+import org.openmuc.framework.data.FloatValue;
+import org.openmuc.framework.data.IntValue;
+import org.openmuc.framework.data.LongValue;
 import org.openmuc.framework.data.Record;
-import org.openmuc.framework.data.Value;
-import org.openmuc.framework.driver.solaredge.settings.ChannelAddress;
+import org.openmuc.framework.data.ShortValue;
+import org.openmuc.framework.data.StringValue;
+import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdgeResponseHandler;
+import org.openmuc.solaredge.data.TimeWrapper;
+import org.openmuc.http.HttpHandler;
+import org.openmuc.http.data.TimeValue;
 import org.openmuc.framework.driver.solaredge.settings.ChannelSettings;
-import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.framework.driver.spi.ChannelRecordContainer;
 import org.openmuc.framework.driver.spi.ChannelValueContainer;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.RecordsReceivedListener;
-import org.openmuc.solaredge.SolarEdgeSite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SolarEdgeConnection implements Connection {
+
+    /**
+     * Interface used by {@link SolarEdgeConnection} to notify the {@link SolarEdgeDriver} about events
+     */
+    public interface SolarEdgeConnectionCallbacks {
+        
+        public void onDisconnect(int siteId);
+    }
+
+    protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
     private final static Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
 
-    private final DriverPreferences prefs = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+    //	private int siteId;
+	private final SolarEdgeResponseHandler reponseHandler;
+	private final int siteId;
+	
+    /**
+     * The Connections current callback object, which is used to notify of connection events
+     */
+    private SolarEdgeConnectionCallbacks callbacks;
 
-    private final SolarEdgeSite connection;
+	public SolarEdgeConnection(int siteId, HttpHandler httpHandler, SolarEdgeConnectionCallbacks callbacks) {
+		this.siteId = siteId;
+		reponseHandler = new SolarEdgeResponseHandler(siteId, httpHandler);
+	}
+	
+	@Override
+	public void disconnect() {
+		if (callbacks != null) {
+		  callbacks.onDisconnect(siteId);
+          callbacks = null;
+		}
+	}
 
-    public SolarEdgeConnection(String addressStr, String deviceStr) throws ArgumentSyntaxException {
-        DeviceAddress address = prefs.parse(addressStr, DeviceAddress.class);
-        
-        this.connection = new SolarEdgeSite(address.getAddress());
-    }
+	@Override
+	public Object read(List<ChannelRecordContainer> containers, Object containerListHandle, String samplingGroup)
+			throws UnsupportedOperationException, ConnectionException {
+    	try {
+	        for (ChannelRecordContainer container : containers) {
+	        	String valuePath = container.getChannelAddress();
+                ChannelSettings settings = preferences.get(container.getChannelSettings(), ChannelSettings.class);
+	        	String timePath = settings.getTimePath();
+	        	String timeUnit = settings.getTimeUnit();
+	        	String serialNumber = settings.getSerialNumber();
+	        	TimeValue timeValuePair = reponseHandler.
+	        			getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+	        	Record record = timeValuePairToRecord(timeValuePair);
+	        	container.setRecord(record);
+	        }
+		} catch (Exception e) {
+            throw new ConnectionException("channel not found");
+		}
+		
+		return new Record(Flag.UNKNOWN_ERROR);
+	}
 
-    @Override
-    public List<ChannelScanInfo> scanForChannels(String settings)
-            throws UnsupportedOperationException, ArgumentSyntaxException, ScanException, ConnectionException {
+	@Override
+	public List<ChannelScanInfo> scanForChannels(String settings)
+			throws UnsupportedOperationException, ArgumentSyntaxException, ScanException, ConnectionException {
+		throw new UnsupportedOperationException();
+	}
 
-        // TODO Implement your channel scan or remove the whole method
-        return null;
-    }
+	@Override
+	public void startListening(List<ChannelRecordContainer> arg0, RecordsReceivedListener arg1)
+			throws UnsupportedOperationException, ConnectionException {
+        throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public Object read(List<ChannelRecordContainer> containers, Object containerListHandle, String samplingGroup)
-            throws UnsupportedOperationException, ConnectionException {
-        
-        long samplingTime = System.currentTimeMillis();
-        
-        for (ChannelRecordContainer container : containers) {
-            try {
-                ChannelAddress address = prefs.get(container.getChannelAddress(), ChannelAddress.class);
-                ChannelSettings settings = prefs.get(container.getChannelSettings(), ChannelSettings.class);
-                
-                int bar = settings.getBar();
-                logger.info("Channel \"{}\" was configured with setting bar: {}", container.getChannel().getId(), bar);                
-                
-                String foo = address.getFoo();
-                Value value = new DoubleValue((double) connection.read(foo));
-                container.setRecord(new Record(value, samplingTime, Flag.VALID));
-                
-            } catch (ArgumentSyntaxException e) {
-                logger.warn("Unable to configure channel address \"{}\": {}", container.getChannelAddress(), e);
-                container.setRecord(new Record(null, samplingTime, Flag.DRIVER_ERROR_CHANNEL_ADDRESS_SYNTAX_INVALID));
-            }
-        }
-        
-        return null;
-    }
+	@Override
+	public Object write(List<ChannelValueContainer> arg0, Object arg1)
+			throws UnsupportedOperationException, ConnectionException {
+        throw new UnsupportedOperationException();
+	}
 
-    @Override
-    public void startListening(List<ChannelRecordContainer> containers, RecordsReceivedListener listener)
-            throws UnsupportedOperationException, ConnectionException {
+	public static String recordToString(Record r) {
+		String timeStr = new TimeWrapper(r.getTimestamp(),SolarEdgeConst.TIME_FORMAT).getTimeStr();
+		return "value: " + r.getValue() + "; time: " + timeStr + "; flag: " + r.getFlag();
+	}
 
-        // TODO Implement your listener registration or remove the whole method
-        
-    }
-
-    @Override
-    public Object write(List<ChannelValueContainer> containers, Object containerListHandle)
-            throws UnsupportedOperationException, ConnectionException {
-
-        // TODO Implement your write functionality or remove the whole method
-        return null;
-    }
-
-    @Override
-    public void disconnect() {
-
-        // TODO Implement your resource cleanup
-    }
+	public static Record timeValuePairToRecord(TimeValue timeValuePair) {
+		Record rec = null;
+		if (timeValuePair.getValue() instanceof Boolean) {
+			rec = new Record(new BooleanValue((Boolean)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof byte[]) {
+			rec = new Record(new ByteArrayValue((byte[])timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Byte) {
+			rec = new Record(new ByteValue((Byte)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Double) {
+			rec = new Record(new DoubleValue((Double)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Float) {
+			rec = new Record(new FloatValue((Float)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Integer) {
+			rec = new Record(new IntValue((Integer)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Long) {
+			rec = new Record(new LongValue((Long)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof Short) {
+			rec = new Record(new ShortValue((Short)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() instanceof String) {
+			rec = new Record(new StringValue((String)timeValuePair.getValue()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		else if (timeValuePair.getValue() == null) {
+			rec = new Record(new StringValue(null),
+					timeValuePair.getTime(), Flag.NO_VALUE_RECEIVED_YET);
+		}
+		else {
+			rec = new Record(new StringValue(timeValuePair.getValue().toString()),
+					timeValuePair.getTime(), Flag.VALID);
+		}
+		return rec;
+	}
 
 }

@@ -3,51 +3,114 @@
   <driver id="solaredge">
     <name>SolarEdge</name>
     <description><![CDATA[
-        This driver provides a skeleton to help developers start.
       ]]>
     </description>
     
     <deviceAddress>
+      <syntax>
+        <keyValue>false</keyValue>
+        <separator>;</separator>
+      </syntax>
+
       <option id="address">
-        <name>Address</name>
+        <name>Url of SolarEdge Site</name>
         <description><![CDATA[
-            The address that is necessary for the device to work.
+        	Url of SolarEdge Site.<br><br>
+            <b>Example:http://monitoringapi.solaredge.com/</b> 
+          ]]>
+        </description>
+        <mandatory>false</mandatory>
+        <type>STRING</type>
+        <default>http://monitoringapi.solaredge.com</default>
+      </option>
+
+      <option id="siteId">
+        <name>Site Id of SolarEdge Site</name>
+        <description><![CDATA[
+        	Site Id of SolarEdge Site.<br><br>
+          ]]>
+        </description>
+        <mandatory>true</mandatory>
+        <type>INTEGER</type>
+      </option>
+    </deviceAddress>
+
+    <deviceSettings>
+       <syntax>
+        <keyValue assignment="=">true</keyValue>
+        <separator>;</separator>
+      </syntax>
+      
+      <option id="authentication">
+        <name>authentication</name>
+        <description><![CDATA[
+        	authentication for access the site.<br><br>
           ]]>
         </description>
         <mandatory>true</mandatory>
         <type>STRING</type>
-      </option>
-    </deviceAddress>
-    
+      </option>      
+    </deviceSettings>
+
     <channelAddress>
       <syntax>
         <keyValue>false</keyValue>
+        <separator>;</separator>
       </syntax>
-      <option id="foo">
-        <name>Foo</name>
+     
+      <option id="address">
+        <name>Value Path</name>
         <description><![CDATA[
-            The unique key, identifying the type of information that should be read.
-          ]]>
-        </description>
+            The path where to get the value for the channel.<br><br>
+            <b>Example:$.energyDetails.meters[?(@.type=='Production')].values[0].value</b> 
+         ]]>
+		</description>
         <mandatory>true</mandatory>
         <type>STRING</type>
       </option>
     </channelAddress>
-    
+   
     <channelSettings>
-      <option id="bar">
-        <name>Bar</name>
+       <syntax>
+        <keyValue assignment="=">true</keyValue>
+        <separator>;</separator>
+      </syntax>
+
+      <option id="timePath">
+        <name>Time Path</name>
         <description><![CDATA[
-            Some optional integer, to further configure the channel
+            The path where to get the time value for the channel,
+            if a time value exist. Otherwise it could be omitted.
+            In case the time value not exits, the end time of the request is used
+            or the current time.<br><br>            
+            <b>Example:$.energyDetails.meters[?(@.type=='Production')].values[0].date</b> 
           ]]>
         </description>
-        <type>INTEGER</type>
-        <selection>
-          <item value="1">Integer 1</item>
-          <item value="2">Integer 2</item>
-        </selection>
-        <default>1</default>
+        <mandatory>false</mandatory>
+        <type>STRING</type>
+      </option>
+      <option id="timeUnit">
+        <name>Time Unit</name>
+        <description><![CDATA[
+            <br><br>            
+            <b>Example:QUARTER_OF_AN_HOUR</b> 
+          ]]>
+        </description>
+        <mandatory>false</mandatory>
+        <type>STRING</type>
+      </option>
+      <option id="serial">
+        <name>Serial Number</name>
+        <description><![CDATA[
+            The Serial Number of the channel device only for Inverter Technical 
+            Data and Equipment Change Log requests<br><br>            
+            <b>Example:12345678-90</b> 
+          ]]>
+        </description>
+        <mandatory>false</mandatory>
+        <type>STRING</type>
       </option>
     </channelSettings>
   </driver>
 </configuration>
+    
