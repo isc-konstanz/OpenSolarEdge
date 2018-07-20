@@ -12,7 +12,7 @@ import org.openmuc.framework.data.Flag;
 import org.openmuc.framework.data.Record;
 import org.openmuc.framework.driver.solaredge.SolarEdgeConnection;
 import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.core.TestSolarEdgeResponseHandler;
+import org.openmuc.solaredge.TestSolarEdgeResponseHandler;
 import org.openmuc.solaredge.data.TimeWrapper;
 import org.openmuc.http.data.TimeValue;
 import org.openmuc.http.request.HttpRequest;

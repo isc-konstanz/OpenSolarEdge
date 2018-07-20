@@ -1,24 +1,15 @@
 
-configurations.create('embed')
+def projectName = "OpenSolarEdge"
 
 dependencies {
   compile project(':openmuc-http')
-  embed project(':openmuc-http')
-  
+
   testCompile project(':openmuc-http').sourceSets.test.output
 }
 
 jar {
   manifest {
-    name = "OpenSolarEdge"
-    instruction 'Bundle-ClassPath', '.,lib/openmuc-http-' + cfgVersion + '.jar'
-    instruction 'Import-Package', '!org.openmuc.http.*,*' + jarDefaultImportPackageVersion
-    instruction 'Export-Package', ''
-  }
-}
-
-jar {
-  into('lib') {
-    from configurations.embed
+    name = projectName
+    instruction 'Export-Package', '!*.internal.*,*'
   }
 }

@@ -1,4 +1,4 @@
-package org.openmuc.solaredge.core;
+package org.openmuc.solaredge;
 
 import org.openmuc.http.HttpHandler;
 import org.openmuc.http.TestHttpHandler;

@@ -18,21 +18,20 @@ import org.openmuc.framework.data.LongValue;
 import org.openmuc.framework.data.Record;
 import org.openmuc.framework.data.ShortValue;
 import org.openmuc.framework.data.StringValue;
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.SolarEdgeResponseHandler;
-import org.openmuc.solaredge.data.TimeWrapper;
-import org.openmuc.http.HttpHandler;
-import org.openmuc.http.data.TimeValue;
 import org.openmuc.framework.driver.solaredge.settings.ChannelSettings;
 import org.openmuc.framework.driver.spi.ChannelRecordContainer;
 import org.openmuc.framework.driver.spi.ChannelValueContainer;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.RecordsReceivedListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openmuc.http.HttpHandler;
+import org.openmuc.http.data.TimeValue;
+import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdgeResponseHandler;
+import org.openmuc.solaredge.data.TimeWrapper;
 
 public class SolarEdgeConnection implements Connection {
+    protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
     /**
      * Interface used by {@link SolarEdgeConnection} to notify the {@link SolarEdgeDriver} about events
@@ -41,9 +40,6 @@ public class SolarEdgeConnection implements Connection {
         
         public void onDisconnect(int siteId);
     }
-
-    protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
-    private final static Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
 
     //	private int siteId;
 	private final SolarEdgeResponseHandler reponseHandler;

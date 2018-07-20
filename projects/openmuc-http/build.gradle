@@ -1,31 +1,19 @@
 
-def projectName = "OpenMUC Driver - SolarEdge"
+def projectName = "HTTP JSON Path"
 
 def jsonpathversion = "2.4.0"
-def gsonversion = "2.8.2"
+def gsonversion = "2.8.5"
 
-configurations.create('embed')
+dependencies {
+  compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
-dependencies {  
   compile group: 'com.jayway.jsonpath', name: 'json-path', version: jsonpathversion
-  embed group: 'com.jayway.jsonpath', name: 'json-path', version: jsonpathversion
-  
   compile group: 'com.google.code.gson', name: 'gson', version: gsonversion
-  embed group: 'com.google.code.gson', name: 'gson', version: gsonversion
-  
 }
 
 jar {
   manifest {
     name = projectName
-    instruction 'Bundle-ClassPath',  '.,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
-    instruction 'Import-Package', '!com.jayway.jsonpath.*,!com.jayway.jsonpath.*,!com.google.gson.*' + jarDefaultImportPackageVersion
-    instruction 'Export-Package', ''
-  }
-}
-
-jar {
-  into('lib') {
-    from configurations.embed
+    instruction 'Export-Package', '*'
   }
 }

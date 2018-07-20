@@ -1,4 +1,4 @@
-package org.openmuc.solaredge.core;
+package org.openmuc.solaredge;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
