@@ -36,7 +36,7 @@ dependencies {
 jar {
   manifest {
     name = projectName
-    instruction 'Bundle-ClassPath', '.,lib/json-path-request' + cfgVersion + '.jar,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
+    instruction 'Bundle-ClassPath', '.,lib/json-path-request-' + cfgVersion + '.jar,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
     instruction 'Import-Package', '!org.openmuc.jsonpath.*,!org.openmuc.solaredge.*,!com.jayway.jsonpath.*,!com.google.gson.*,*' + jarDefaultImportPackageVersion
     instruction 'Export-Package', ''
   }
