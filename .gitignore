@@ -46,5 +46,6 @@ build/
 !/build/docs
 !/build/libs
 /build/libs/*
+!/build/libs/json-path-request*
 !/build/libs/solaredge*
 !/build/libs/openmuc-driver-*
