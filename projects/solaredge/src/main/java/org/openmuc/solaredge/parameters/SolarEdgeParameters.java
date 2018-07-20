@@ -2,9 +2,9 @@ package org.openmuc.solaredge.parameters;
 
 import java.text.ParseException;
 
+import org.openmuc.jsonpath.request.HttpRequestParameters;
 import org.openmuc.solaredge.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
-import org.openmuc.http.request.HttpRequestParameters;
 
 public class SolarEdgeParameters {
 

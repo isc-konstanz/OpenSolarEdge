@@ -24,19 +24,20 @@ dependencies {
 
   compile project(':solaredge')
   embed project(':solaredge')
+  embed project(':json-path-request')
 
   embed group: 'com.jayway.jsonpath', name: 'json-path', version: jsonpathversion
   embed group: 'com.google.code.gson', name: 'gson', version: gsonversion
 
-  testCompile project(':openmuc-http').sourceSets.test.output
+  testCompile project(':json-path-request').sourceSets.test.output
   testCompile project(':solaredge').sourceSets.test.output
 }
 
 jar {
   manifest {
     name = projectName
-    instruction 'Bundle-ClassPath', '.,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
-    instruction 'Import-Package', '!org.openmuc.http.*,!org.openmuc.solaredge.*,!com.jayway.jsonpath.*,!com.google.gson.*,*' + jarDefaultImportPackageVersion
+    instruction 'Bundle-ClassPath', '.,lib/json-path-request' + cfgVersion + '.jar,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
+    instruction 'Import-Package', '!org.openmuc.jsonpath.*,!org.openmuc.solaredge.*,!com.jayway.jsonpath.*,!com.google.gson.*,*' + jarDefaultImportPackageVersion
     instruction 'Export-Package', ''
   }
 }

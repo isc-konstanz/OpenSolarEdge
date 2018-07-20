@@ -1,6 +1,6 @@
 package org.openmuc.solaredge.data;
 
-import org.openmuc.http.data.ApiKeyConst;
+import org.openmuc.jsonpath.data.ApiKeyConst;
 
 public class SolarEdgeApiKeyConst extends ApiKeyConst {
 

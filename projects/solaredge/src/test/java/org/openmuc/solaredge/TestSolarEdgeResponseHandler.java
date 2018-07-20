@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
-import org.openmuc.http.TestHttpHandler;
+import org.openmuc.jsonpath.TestHttpHandler;
 import org.openmuc.solaredge.SolarEdgeConfig;
 import org.openmuc.solaredge.SolarEdgeConst;
 import org.openmuc.solaredge.SolarEdgeResponseHandler;

@@ -1,9 +1,9 @@
 package org.openmuc.solaredge;
 
-import org.openmuc.http.HttpHandler;
-import org.openmuc.http.TestHttpHandler;
-import org.openmuc.http.data.Authentication;
-import org.openmuc.http.data.Config;
+import org.openmuc.jsonpath.HttpHandler;
+import org.openmuc.jsonpath.TestHttpHandler;
+import org.openmuc.jsonpath.data.Authentication;
+import org.openmuc.jsonpath.data.Config;
 import org.openmuc.solaredge.SolarEdgeHttpFactory;
 
 public class TestHttpFactory extends SolarEdgeHttpFactory {

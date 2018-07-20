@@ -2,9 +2,9 @@
 def projectName = "OpenSolarEdge"
 
 dependencies {
-  compile project(':openmuc-http')
+  compile project(':json-path-request')
 
-  testCompile project(':openmuc-http').sourceSets.test.output
+  testCompile project(':json-path-request').sourceSets.test.output
 }
 
 jar {

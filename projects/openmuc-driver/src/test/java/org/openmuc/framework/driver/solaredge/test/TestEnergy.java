@@ -14,8 +14,8 @@ import org.openmuc.framework.driver.solaredge.SolarEdgeConnection;
 import org.openmuc.solaredge.SolarEdgeConst;
 import org.openmuc.solaredge.TestSolarEdgeResponseHandler;
 import org.openmuc.solaredge.data.TimeWrapper;
-import org.openmuc.http.data.TimeValue;
-import org.openmuc.http.request.HttpRequest;
+import org.openmuc.jsonpath.data.TimeValue;
+import org.openmuc.jsonpath.request.HttpRequest;
 
 public class TestEnergy {
 

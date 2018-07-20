@@ -12,7 +12,7 @@ import org.openmuc.framework.driver.solaredge.settings.DeviceSettings;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.DriverService;
-import org.openmuc.http.HttpHandler;
+import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.solaredge.SolarEdgeConfig;
 import org.openmuc.solaredge.SolarEdgeHttpFactory;
 import org.osgi.service.component.annotations.Component;

@@ -2,7 +2,7 @@ package org.openmuc.solaredge.data;
 
 import java.text.ParseException;
 
-import org.openmuc.http.data.TimeConverter;
+import org.openmuc.jsonpath.data.TimeConverter;
 
 public class TimeWrapper {
 	

@@ -1,8 +1,8 @@
 package org.openmuc.solaredge;
 
-import org.openmuc.http.HttpFactory;
-import org.openmuc.http.data.Authentication;
-import org.openmuc.http.data.Authorization;
+import org.openmuc.jsonpath.HttpFactory;
+import org.openmuc.jsonpath.data.Authentication;
+import org.openmuc.jsonpath.data.Authorization;
 import org.openmuc.solaredge.data.SolarEdgeApiKeyConst;
 
 public class SolarEdgeHttpFactory extends HttpFactory {

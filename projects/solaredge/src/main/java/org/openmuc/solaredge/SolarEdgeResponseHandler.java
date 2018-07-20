@@ -17,13 +17,13 @@ import org.openmuc.solaredge.parameters.SolarEdgeSiteSonsorsParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeStartEndTimeParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeStorageDataParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeTimeFrameEnergyParameters;
-import org.openmuc.http.HttpHandler;
-import org.openmuc.http.data.TimeValue;
-import org.openmuc.http.request.HttpRequest;
-import org.openmuc.http.request.HttpRequestAction;
-import org.openmuc.http.request.HttpRequestMethod;
-import org.openmuc.http.request.HttpRequestParameters;
-import org.openmuc.http.request.json.JsonResponse;
+import org.openmuc.jsonpath.HttpHandler;
+import org.openmuc.jsonpath.data.TimeValue;
+import org.openmuc.jsonpath.request.HttpRequest;
+import org.openmuc.jsonpath.request.HttpRequestAction;
+import org.openmuc.jsonpath.request.HttpRequestMethod;
+import org.openmuc.jsonpath.request.HttpRequestParameters;
+import org.openmuc.jsonpath.request.json.JsonResponse;
 
 /**
  * We only support the dots (".") notation for JsonPath and also

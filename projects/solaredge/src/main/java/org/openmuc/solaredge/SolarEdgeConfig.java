@@ -1,6 +1,6 @@
 package org.openmuc.solaredge;
 
-import org.openmuc.http.data.Config;
+import org.openmuc.jsonpath.data.Config;
 
 public class SolarEdgeConfig extends Config {
 

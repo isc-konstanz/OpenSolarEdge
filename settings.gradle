@@ -1,7 +1,6 @@
-include "openmuc-driver-solaredge", "solaredge", "openmuc-http"
+include "openmuc-driver-solaredge", "solaredge", "json-path-request"
 
-project(":openmuc-driver-solaredge").projectDir = file("projects/openmuc-driver")
-
+project(":json-path-request").projectDir = file("projects/json-path-request")
 project(":solaredge").projectDir = file("projects/solaredge")
 
-project(":openmuc-http").projectDir = file("projects/openmuc-http")
+project(":openmuc-driver-solaredge").projectDir = file("projects/openmuc-driver")
