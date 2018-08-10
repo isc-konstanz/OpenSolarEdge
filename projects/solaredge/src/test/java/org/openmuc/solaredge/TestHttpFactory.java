@@ -4,18 +4,25 @@ import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.jsonpath.TestHttpHandler;
 import org.openmuc.jsonpath.data.Authentication;
 import org.openmuc.jsonpath.data.Config;
-import org.openmuc.solaredge.SolarEdgeHttpFactory;
 
 public class TestHttpFactory extends SolarEdgeHttpFactory {
+	
+	protected final static TestHttpFactory factory = new TestHttpFactory();
 
-	public static TestHttpHandler newAuthenticatedConnection(Config config) {
+	public static TestHttpFactory getHttpFactory() {
+		return factory;
+	}
+	
 
-		Authentication credentials = factory.getCredentials(config.getAuthorization(), config.getAuthentication());
+	@Override
+	public TestHttpHandler newAuthenticatedConnection(Config config) {
+
+		Authentication credentials = getCredentials(config.getAuthorization(), config.getAuthentication());
 		
 		return getConnection(config.getUrl(), credentials, config.getMaxThreads());
 	}
 
-	private static TestHttpHandler getConnection(String address, Authentication credentials, Integer maxThreads) {
+	private TestHttpHandler getConnection(String address, Authentication credentials, Integer maxThreads) {
 
 		if (address != null) {
 			address = verifyAddress(address);

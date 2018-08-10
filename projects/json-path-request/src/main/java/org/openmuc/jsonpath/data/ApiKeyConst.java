@@ -9,12 +9,7 @@ public class ApiKeyConst {
 		return API_KEY_CONST;
 	}
 
-	private String key = "apikey";
-	
-	protected ApiKeyConst() {
-	}
-
 	public String getKey() {
-		return key;
+		return "apikey";
 	}
 }

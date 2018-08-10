@@ -27,8 +27,8 @@ public enum Authorization {
 
 	public static String apiKey;
 	
-	public static void setApiKey(ApiKeyConst apiKeyConst) {
-		apiKey = apiKeyConst.getKey();
+	public static void setApiKey(String key) {
+		apiKey = key;
 	}
 	
 	public String getValue() {
