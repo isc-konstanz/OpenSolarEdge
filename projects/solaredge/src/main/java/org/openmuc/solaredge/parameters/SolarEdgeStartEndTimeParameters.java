@@ -34,7 +34,7 @@ public class SolarEdgeStartEndTimeParameters extends SolarEdgeParameters {
 		
 		TimeWrapper nextLastTime;		
 		if (lastTime == null || (now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit))<lastTime.getTime()) {
-			nextLastTime = new TimeWrapper(now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit), SolarEdgeConst.TIME_FORMAT);
+			nextLastTime = new TimeWrapper(now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit), nowTimeFormat);
 		}
 		else {
 			nextLastTime =  lastTime.clone();
