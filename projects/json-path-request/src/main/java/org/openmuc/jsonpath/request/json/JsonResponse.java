@@ -24,7 +24,7 @@ public class JsonResponse {
 		return response;
 	}
 	
-	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat) {
+	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat) throws ParseException {
 		Object val = getValue(valuePath);
 		Long time = getTimeFromJson(timePath, timeFormat);
 		return getTimeValuePair(val, time);
@@ -55,18 +55,13 @@ public class JsonResponse {
 		return getValue(obj);
 	}
 	
-	public Long getTimeFromJson(String path, String timeFormat) {
+	public Long getTimeFromJson(String path, String timeFormat) throws ParseException {
 		Object obj = jsonContext.read(path);
 		if (obj instanceof JSONArray) {
 			obj = ((JSONArray)obj).get(0).toString();
 		}
 		Long time = null;
-		try {
-			time = TimeConverter.timeStringToTime(obj.toString(),timeFormat);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		time = TimeConverter.timeStringToTime(obj.toString(),timeFormat);
 		return time;
 	}
 	
