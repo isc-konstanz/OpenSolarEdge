@@ -14,18 +14,20 @@ public class TestHttpCallable extends HttpCallable {
 		super(request);
 	}
 	
+	@Override
 	protected JsonResponse get(HttpRequest request) throws IOException {
 		if (response == null) {
 			return null;
 		}
-		return new TestJsonResponse(response);
+		return new JsonResponse(response);
 	}
 	
+	@Override
 	protected JsonResponse post(HttpRequest request) throws IOException {
 		if (response == null) {
 			return null;
 		}
-		return new TestJsonResponse(response);
+		return new JsonResponse(response);
 	}
 
 	public void setResponse(String response) {
