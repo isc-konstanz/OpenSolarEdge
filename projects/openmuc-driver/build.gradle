@@ -1,7 +1,7 @@
 
 def projectName = "OpenMUC Driver - SolarEdge"
 
-def openmucversion = '2.0.0'
+def openmucversion = '2.2.1'
 def jsonpathversion = "2.4.0"
 def gsonversion = "2.8.5"
 
@@ -21,10 +21,12 @@ dependencies {
 
   compile group: 'org.openmuc.framework', name: 'openmuc-core-api', version: openmucversion
   compile group: 'org.openmuc.framework', name: 'openmuc-core-spi', version: openmucversion
+  
+  compile project(':json-path-request')
+  embed project(':json-path-request')
 
   compile project(':solaredge')
   embed project(':solaredge')
-  embed project(':json-path-request')
 
   embed group: 'com.jayway.jsonpath', name: 'json-path', version: jsonpathversion
   embed group: 'com.google.code.gson', name: 'gson', version: gsonversion
@@ -36,8 +38,8 @@ dependencies {
 jar {
   manifest {
     name = projectName
-    instruction 'Bundle-ClassPath', '.,lib/json-path-request-' + cfgVersion + '.jar,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar'
-    instruction 'Import-Package', '!org.openmuc.jsonpath.*,!org.openmuc.solaredge.*,!com.jayway.jsonpath.*,!com.google.gson.*,*' + jarDefaultImportPackageVersion
+    instruction 'Bundle-ClassPath', '.,lib/json-path-request-' + cfgVersion + '.jar,lib/solaredge-' + cfgVersion + '.jar,lib/json-path-' + jsonpathversion + '.jar,lib/gson-' + gsonversion + '.jar,lib/json-smart-2.3.jar,lib/accessors-smart-1.2.jar' 
+    instruction 'Import-Package', '!org.openmuc.jsonpath.*,!org.openmuc.solaredge.*,!com.jayway.jsonpath.*,!net.minidev.json.*,!net.minidev.asm.*,!com.google.gson.*,org.slf4j,*' + jarDefaultImportPackageVersion
     instruction 'Export-Package', ''
   }
 }
