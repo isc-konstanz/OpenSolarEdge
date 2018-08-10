@@ -1,5 +1,6 @@
 package org.openmuc.framework.driver.solaredge;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.openmuc.framework.config.ArgumentSyntaxException;
@@ -42,8 +43,8 @@ public class SolarEdgeConnection implements Connection {
     }
 
     //	private int siteId;
-	private final SolarEdgeResponseHandler reponseHandler;
-	private final int siteId;
+	protected SolarEdgeResponseHandler responseHandler;
+	protected final int siteId;
 	
     /**
      * The Connections current callback object, which is used to notify of connection events
@@ -52,7 +53,15 @@ public class SolarEdgeConnection implements Connection {
 
 	public SolarEdgeConnection(int siteId, HttpHandler httpHandler, SolarEdgeConnectionCallbacks callbacks) {
 		this.siteId = siteId;
-		reponseHandler = new SolarEdgeResponseHandler(siteId, httpHandler);
+		createResponseHandler(httpHandler);
+	}
+	
+	protected void createResponseHandler(HttpHandler httpHandler) {
+		responseHandler = new SolarEdgeResponseHandler(siteId, httpHandler);
+	}
+	
+	public SolarEdgeResponseHandler getResponseHandler() {
+		return responseHandler;
 	}
 	
 	@Override
@@ -68,14 +77,7 @@ public class SolarEdgeConnection implements Connection {
 			throws UnsupportedOperationException, ConnectionException {
     	try {
 	        for (ChannelRecordContainer container : containers) {
-	        	String valuePath = container.getChannelAddress();
-                ChannelSettings settings = preferences.get(container.getChannelSettings(), ChannelSettings.class);
-	        	String timePath = settings.getTimePath();
-	        	String timeUnit = settings.getTimeUnit();
-	        	String serialNumber = settings.getSerialNumber();
-	        	TimeValue timeValuePair = reponseHandler.
-	        			getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
-	        	Record record = timeValuePairToRecord(timeValuePair);
+	        	Record record = getRecord(container.getChannelAddress(), container.getChannelSettings());
 	        	container.setRecord(record);
 	        }
 		} catch (Exception e) {
@@ -83,6 +85,26 @@ public class SolarEdgeConnection implements Connection {
 		}
 		
 		return new Record(Flag.UNKNOWN_ERROR);
+	}
+	
+	protected Record getRecord(String channelAddress, String channelSettings) {
+    	String valuePath = channelAddress;
+        ChannelSettings settings;
+        Record record;
+		try {
+			settings = preferences.get(channelSettings, ChannelSettings.class);
+	    	String timePath = settings.getTimePath();
+	    	String timeUnit = settings.getTimeUnit();
+	    	String serialNumber = settings.getSerialNumber();
+	    	TimeValue timeValuePair = responseHandler.
+	    			getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+	    	record = timeValuePairToRecord(timeValuePair);
+		} catch (ArgumentSyntaxException e) {
+			record = new Record(Flag.DRIVER_ERROR_CHANNEL_ADDRESS_SYNTAX_INVALID);
+		} catch (ParseException e) {
+			record = new Record(Flag.DRIVER_ERROR_CHANNEL_VALUE_TYPE_CONVERSION_EXCEPTION);
+		}
+    	return record;
 	}
 
 	@Override
