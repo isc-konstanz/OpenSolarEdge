@@ -4,44 +4,37 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
-import org.openmuc.jsonpath.TestHttpHandler;
-import org.openmuc.solaredge.SolarEdgeConfig;
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.SolarEdgeResponseHandler;
+import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class TestSolarEdgeResponseHandler extends SolarEdgeResponseHandler {
-
-	SolarEdgeConfig config;
 	
-	public TestSolarEdgeResponseHandler(String jsonString) {
-		TestHttpHandler httpHandler;
-
-		config = new SolarEdgeConfig();
-			
-		httpHandler = TestHttpFactory.newAuthenticatedConnection(config);
-		httpHandler.setResponse(jsonString);
-		httpHandler.start();
-		this.setSiteId(78467);
-		this.setHttpHandler(httpHandler);
-
-		System.out.println("JsonString: " + jsonString);
+	public TestSolarEdgeResponseHandler(int siteId, HttpHandler httpHandler) {
+		super(siteId, httpHandler);
 	}
 	
-	String getAuthenticiation() {
-		return config.getAuthentication();
-	}
-
 	public TimeWrapper getTimeWrapper() {
 		return time;
 	}
+	
+	public TimeWrapper getLastTime() {
+		return lastTime;
+	}
 
+	public String fillRequest(String request, String timeUnit, String authenticiation) {
+		StringTokenizer tokenizer = new StringTokenizer(request, "=");
+		String retVal = tokenizer.nextToken() + "=" + addStartTime();
+		retVal += tokenizer.nextToken() + "=" + addEndTime();
+		retVal += tokenizer.nextToken() + "=" + timeUnit;
+		retVal += tokenizer.nextToken() + "=" + authenticiation;
+		return retVal;
+	}
 	public String fillParameters(String parameters, String timeUnit) {
 		StringTokenizer tokenizer = new StringTokenizer(parameters, "=");
 		String retVal = tokenizer.nextToken() + "=" + addStartTime();
 		retVal += tokenizer.nextToken() + "=" + addEndTime();
 		retVal += tokenizer.nextToken() + "=" + timeUnit;
-		retVal += tokenizer.nextToken() + "=" + getAuthenticiation();
+		//retVal += tokenizer.nextToken() + "=" + getAuthenticiation();
 		return retVal;
 	}
 
@@ -64,6 +57,7 @@ public class TestSolarEdgeResponseHandler extends SolarEdgeResponseHandler {
 		}
 		return t;
 	}
+
 	
 	
 }
