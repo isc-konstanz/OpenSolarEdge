@@ -92,7 +92,7 @@ public class SolarEdgeResponseHandler {
 			try {
 				HttpRequestAction action = new HttpRequestAction("");
 				request = httpHandler.getRequest(requestPath, action, 
-						parameters, HttpRequestMethod.POST);
+						parameters, HttpRequestMethod.GET);
 				response = httpHandler.onRequest(request);
 			}
 			catch (Exception ex) {
@@ -145,7 +145,6 @@ public class SolarEdgeResponseHandler {
 			// list-, Inventory-, SiteSensors-, version-, supported-requests 
 			params = new SolarEdgeParameters();
 		}
-		// TODO add api_key Parameter
 		HttpRequestParameters parameters = params.getParameters();
 		if (params instanceof SolarEdgeStartEndTimeParameters) {
 			lastTime = ((SolarEdgeStartEndTimeParameters)params).getLastTime();
