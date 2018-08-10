@@ -68,16 +68,17 @@ public class HttpCallable implements Callable<JsonResponse> {
 	protected JsonResponse get(HttpRequest request) throws IOException {
 		try {
 			URL url = new URL(request.getRequest(CHARSET));
+			System.out.println(url.toString());
 			connection = (HttpURLConnection) url.openConnection();
 			
-			connection.setRequestMethod(HttpRequestMethod.GET.name());
+			connection.setRequestMethod(request.getMethod().name());
 			connection.setRequestProperty("Charset", CHARSET.name());
 			connection.setRequestProperty("Accept-Charset", CHARSET.name());
 			connection.setRequestProperty("Connection", "Close");
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset="+CHARSET.name());
 			connection.setRequestProperty("Content-length", "0");
 			
-			connection.setInstanceFollowRedirects(false);
+			connection.setInstanceFollowRedirects(true);
 			connection.setAllowUserInteraction(false);
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);
@@ -179,6 +180,7 @@ public class HttpCallable implements Callable<JsonResponse> {
 			sb.append(line);
 		}
 		if (sb.length() != 0 && !sb.toString().isEmpty()) {
+			System.out.println("response: " + sb.toString());
 			return new JsonResponse(sb.toString());
 		}
 		return null;
