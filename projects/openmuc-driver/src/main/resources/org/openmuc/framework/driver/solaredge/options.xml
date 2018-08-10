@@ -25,7 +25,7 @@
       </option>
 
       <option id="siteId">
-        <name>Site Id of SolarEdge Site</name>
+        <name>Site Id</name>
         <description><![CDATA[
         	Site Id of SolarEdge Site.<br><br>
           ]]>
@@ -42,9 +42,9 @@
       </syntax>
       
       <option id="authentication">
-        <name>authentication</name>
+        <name>Authentication</name>
         <description><![CDATA[
-        	authentication for access the site.<br><br>
+        	Authentication for access the site.<br><br>
           ]]>
         </description>
         <mandatory>true</mandatory>
@@ -58,10 +58,11 @@
         <separator>;</separator>
       </syntax>
      
-      <option id="address">
+      <option id="path">
         <name>Value Path</name>
         <description><![CDATA[
-            The path where to get the value for the channel.<br><br>
+            The path where to get the value for the channel. 
+            For Syntax see: <a href="https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html">Json Path Syntax</a><br><br>
             <b>Example:$.energyDetails.meters[?(@.type=='Production')].values[0].value</b> 
          ]]>
 		</description>
@@ -82,7 +83,8 @@
             The path where to get the time value for the channel,
             if a time value exist. Otherwise it could be omitted.
             In case the time value not exits, the end time of the request is used
-            or the current time.<br><br>            
+            or the current time.
+            For Syntax see: <a href="https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html">Json Path Syntax</a><br><br>            
             <b>Example:$.energyDetails.meters[?(@.type=='Production')].values[0].date</b> 
           ]]>
         </description>
