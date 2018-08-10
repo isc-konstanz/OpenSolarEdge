@@ -85,13 +85,21 @@ public class HttpRequest {
 			case PUT:
 				break;
 			default:
-				if (action != null && action.size() > 0) {
+				if (parameters != null) {
+					request += '?';
+					request += parseParameters(charset);					
 					request += '&';
+					request += getAuthentication(charset);
 				}
 				else {
-					request += '?';
+					if (action != null && action.size() > 0) {
+						request += '&';
+					}
+					else {
+						request += '?';
+					}
+					request += getAuthentication(charset);
 				}
-				request += getAuthentication(charset);
 				break;
 			}
 		}
