@@ -98,7 +98,7 @@ public class HttpHandler implements HttpRequestCallbacks {
 	@Override
 	public HttpRequest getRequest(String parent, Authentication authentication, HttpRequestAction action,
 			HttpRequestParameters parameters, HttpRequestMethod method) {
-		String url = address + parent.toLowerCase();
+		String url = address + parent;
 		if (!url.endsWith("/"))
 			url += "/";
 		
