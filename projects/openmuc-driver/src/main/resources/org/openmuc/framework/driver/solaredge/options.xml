@@ -2,9 +2,8 @@
 <configuration>
   <driver id="solaredge">
     <name>SolarEdge</name>
-    <description><![CDATA[Uses the server api of: <img href="https://github.com/isc-konstanz/OpenSolarEdge/blob/master/doc/img/SolarEdge_logo.svg.png">solar edge</img><br>
-    
-    
+    <description><![CDATA[Uses the server api of: <img src="https://github.com/isc-konstanz/OpenSolarEdge/blob/master/doc/img/SolarEdge_logo.svg.png?raw=true" 
+    height="32" width="160" "alt="Solar Edge"><br>
       ]]>
     </description>
     
