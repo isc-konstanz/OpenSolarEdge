@@ -19,10 +19,12 @@ import org.osgi.service.component.annotations.Component;
 
 @Component
 public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallbacks {
-    private final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+    protected final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
-	private final Map<Integer, SolarEdgeConnection> connectionsMap;
-	private HttpHandler httpHandler;
+	protected final Map<Integer, SolarEdgeConnection> connectionsMap;
+	protected HttpHandler httpHandler;
+	protected DeviceAddress address;
+	protected DeviceSettings settings;
 
 	public SolarEdgeDriver() {
 		connectionsMap = new HashMap<Integer, SolarEdgeConnection>();
@@ -31,23 +33,31 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 	@Override
 	public Connection connect(String addressStr, String settingsStr) throws ArgumentSyntaxException, ConnectionException {
 
-        DeviceAddress address = info.parse(addressStr, DeviceAddress.class);
-        DeviceSettings settings = info.parse(settingsStr, DeviceSettings.class);
+        address = info.parse(addressStr, DeviceAddress.class);
+        settings = info.parse(settingsStr, DeviceSettings.class);
 		
 		SolarEdgeConnection connection = connectionsMap.get(address.getSiteId());
 		
 		if (connection == null) {
 			SolarEdgeConfig config = new SolarEdgeConfig(address.getAddress(), settings.getAuthentication());				
-			httpHandler = SolarEdgeHttpFactory.newAuthenticatedConnection(config);
+			httpHandler = getHttpHandler(config);
 
-			connection = new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
+			connection = createConnection(address);
 			connectionsMap.put(address.getSiteId(), connection);
 			httpHandler.start();
 		}
 
 		return connection;
 	}
+	
+	protected HttpHandler getHttpHandler(SolarEdgeConfig config) {
+		return SolarEdgeHttpFactory.getHttpFactory().newAuthenticatedConnection(config);
+	}
 
+	protected SolarEdgeConnection createConnection(DeviceAddress address) {
+		return new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
+	}
+	
 	@Override
 	public DriverInfo getInfo() {
 		return info;
