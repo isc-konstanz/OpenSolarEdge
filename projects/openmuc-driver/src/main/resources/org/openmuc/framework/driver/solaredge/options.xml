@@ -16,7 +16,9 @@
       <option id="address">
         <name>Url of SolarEdge Site</name>
         <description><![CDATA[
-        	Url of SolarEdge Site.<br><br>
+        	Url of SolarEdge Site.<br>
+        	See: <a href="https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf">
+			SolarEdge Monitoring Server API</a><br><br>
             <b>Example:http://monitoringapi.solaredge.com/</b> 
           ]]>
         </description>
@@ -91,18 +93,31 @@
      <option id="timeUnit">
         <name>Time Unit</name>
         <description><![CDATA[
-            <br><br>            
-            <b>Example:QUARTER_OF_AN_HOUR</b> 
+            <br>Time difference until this channel sends a next http request.<br>
+			The Time Unit can depend on the http request send. For detailed information 
+			see <a href="https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf">
+			SolarEdge Monitoring Server API</a>          
           ]]>
         </description>
         <mandatory>false</mandatory>
         <type>STRING</type>
+        <selection>
+          <validate>true</validate>
+          <item value="FIVE_MINUTE">5 Minutes</item>
+          <item value="QUARTER_OF_AN_HOUR">15 Minutes</item>
+          <item value="HALF_OF_AN_HOUR">30 Minutes</item>
+          <item value="HOUR">1 Hour</item>
+          <item value="DAY">1 Day</item>
+          <item value="WEEK">1 Week</item>
+          <item value="MONTH">1 Month</item>
+          <item value="YEAR">1 Year</item>
+        </selection>
       </option>
       <option id="serialNumber">
         <name>Serial Number</name>
         <description><![CDATA[
             The Serial Number of the channel device only for Inverter Technical 
-            Data and Equipment Change Log requests<br><br>            
+            Data, Equipment Change Log, Storage Data reuqests<br><br>            
             <b>Example:12345678-90</b> 
           ]]>
         </description>
