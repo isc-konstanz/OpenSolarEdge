@@ -77,6 +77,8 @@ public class SolarEdgeResponseHandler {
 
 	public TimeValue getTimeValuePair(String valuePath, String timePath, String timeUnit,
 			String serialNumber) throws ParseException {
+		valuePath = replaceSerialNumberInPath(valuePath, serialNumber);
+		timePath = replaceSerialNumberInPath(timePath, serialNumber);
 		String requestKey = getRequestKey(valuePath);
 		ResponseMapKey responseMapKey = new ResponseMapKey(requestKey, time, timeUnit);
 		JsonResponse response = responseMap.get(responseMapKey);
@@ -181,6 +183,14 @@ public class SolarEdgeResponseHandler {
 		String retval = string;
 		if (string.contains(SolarEdgeConst.SERIAL_NUMBER)) {
 			retval = string.replaceAll(SolarEdgeConst.SERIAL_NUMBER, serialNumber);
+		}
+		return retval;
+	}
+
+	private String replaceSerialNumberInPath(String path, String serialNumber) {
+		String retval = path;
+		if (path != null && path.contains(SolarEdgeConst.SERIAL_NUMBER)) {
+			retval = path.replaceAll(SolarEdgeConst.SERIAL_NUMBER, serialNumber);
 		}
 		return retval;
 	}
