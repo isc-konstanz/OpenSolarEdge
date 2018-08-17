@@ -25,7 +25,9 @@ public class TestSolarEdgeResponseHandler extends SolarEdgeResponseHandler {
 		StringTokenizer tokenizer = new StringTokenizer(request, "=");
 		String retVal = tokenizer.nextToken() + "=" + addStartTime();
 		retVal += tokenizer.nextToken() + "=" + addEndTime();
-		retVal += tokenizer.nextToken() + "=" + timeUnit;
+		if (timeUnit != null) {
+			retVal += tokenizer.nextToken() + "=" + timeUnit;
+		}
 		retVal += tokenizer.nextToken() + "=" + authenticiation;
 		return retVal;
 	}
@@ -33,7 +35,9 @@ public class TestSolarEdgeResponseHandler extends SolarEdgeResponseHandler {
 		StringTokenizer tokenizer = new StringTokenizer(parameters, "=");
 		String retVal = tokenizer.nextToken() + "=" + addStartTime();
 		retVal += tokenizer.nextToken() + "=" + addEndTime();
-		retVal += tokenizer.nextToken() + "=" + timeUnit;
+		if (timeUnit != null) {
+			retVal += tokenizer.nextToken() + "=" + timeUnit;
+		}
 		//retVal += tokenizer.nextToken() + "=" + getAuthenticiation();
 		return retVal;
 	}
