@@ -57,7 +57,7 @@
       <syntax>
         <keyValue>false</keyValue>
       </syntax>
-      <option id="address">
+      <option id="request">
         <name>Request</name>
         <description>Requested value</description>
         <mandatory>true</mandatory>
