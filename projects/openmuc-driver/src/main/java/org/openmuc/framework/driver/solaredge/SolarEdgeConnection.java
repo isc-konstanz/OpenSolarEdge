@@ -88,23 +88,30 @@ public class SolarEdgeConnection implements Connection {
 	}
 	
 	protected Record getRecord(String channelAddress, String channelSettings) {
-    	String valuePath = channelAddress;
-        ChannelSettings settings;
-        Record record;
+         Record record;
 		try {
-			settings = preferences.get(channelSettings, ChannelSettings.class);
-	    	String timePath = settings.getTimePath();
+		    ChannelSettings settings = preferences.get(channelSettings, ChannelSettings.class);
+	    	String timePath = settings.getTimePath(channelAddress);
 	    	String timeUnit = settings.getTimeUnit();
+	    	String valuePath = settings.getValuePath(channelAddress);
 	    	String serialNumber = settings.getSerialNumber();
-	    	TimeValue timeValuePair = responseHandler.
-	    			getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
-	    	record = timeValuePairToRecord(timeValuePair);
+	    	record = getRecord(valuePath, timePath, timeUnit, serialNumber);
 		} catch (ArgumentSyntaxException e) {
 			record = new Record(Flag.DRIVER_ERROR_CHANNEL_ADDRESS_SYNTAX_INVALID);
+		}
+		return record;
+	}
+	
+	protected Record getRecord(String valuePath, String timePath, String timeUnit, String serialNumber) {
+    	Record record;
+		try {
+			TimeValue timeValuePair = responseHandler.
+					getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+	    	record = timeValuePairToRecord(timeValuePair);
 		} catch (ParseException e) {
 			record = new Record(Flag.DRIVER_ERROR_CHANNEL_VALUE_TYPE_CONVERSION_EXCEPTION);
 		}
-    	return record;
+		return record;
 	}
 
 	@Override

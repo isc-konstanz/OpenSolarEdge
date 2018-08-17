@@ -68,13 +68,8 @@ public class TestEnergy {
 			return;
 		}
         
-        Record rec = null;
-		try {
-			rec = connection.getRecordForTest("$.energy", "timeUnit="+SolarEdgeConst.QUARTER_OF_AN_HOUR);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}		System.out.println(SolarEdgeConnection.recordToString(rec));
+        Record rec = connection.getRecordForTest("$.energy", null, SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+		System.out.println(SolarEdgeConnection.recordToString(rec));
         assertEquals("{timeUnit=DAY, unit=Wh, values=[{\"date\":\"2013-06-01 00:00:00\",\"value\":null},{\"date\":\"2013-06-02 00:00:00\",\"value\":null},{\"date\":\"2013-06-03 00:00:00\",\"value\":null},{\"date\":\"2013-06-04 00:00:00\",\"value\":67313.24}]}", rec.getValue().asString());
         try {
 			assertEquals(responseHandler.getTimeWrapper().getTime(), rec.getTimestamp());
@@ -102,14 +97,8 @@ public class TestEnergy {
 			return;
 		}
 
-        Record rec = null;
-        try {
-			rec = connection.getRecordForTest("$.energy.values[-1].value", 
-					"timePath=$.energy.values[-1].date;timeUnit="+SolarEdgeConst.QUARTER_OF_AN_HOUR);
-		} catch (ParseException e) {
-			e.printStackTrace();
- 			assertTrue(false);
-		}
+        Record rec = connection.getRecordForTest("$.energy.values[-1].value", 
+					"$.energy.values[-1].date", SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
  			
         HttpRequest request = responseHandler.getRequest();
 		try {

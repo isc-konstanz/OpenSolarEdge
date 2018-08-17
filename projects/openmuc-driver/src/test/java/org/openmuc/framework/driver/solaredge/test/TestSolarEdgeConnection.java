@@ -1,7 +1,5 @@
 package org.openmuc.framework.driver.solaredge.test;
 
-import java.text.ParseException;
-
 import org.openmuc.framework.data.Record;
 import org.openmuc.framework.driver.solaredge.SolarEdgeConnection;
 import org.openmuc.jsonpath.HttpHandler;
@@ -18,7 +16,12 @@ public class TestSolarEdgeConnection extends SolarEdgeConnection {
 		responseHandler = new TestSolarEdgeResponseHandler(siteId, httpHandler);
 	}
 	
-	public Record getRecordForTest(String channelAddress, String channelSettings) throws ParseException {
+	public Record getRecordForTest(String channelAddress, String channelSettings) {
 		return getRecord(channelAddress, channelSettings);
 	}
+	
+	public Record getRecordForTest(String valuePath, String timePath, String timeUnit, String serialNumber) {
+		return getRecord(valuePath, timePath, timeUnit, serialNumber);
+	}
+	
 }

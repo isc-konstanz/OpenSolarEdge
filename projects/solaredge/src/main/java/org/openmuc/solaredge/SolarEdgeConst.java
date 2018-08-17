@@ -33,6 +33,44 @@ public class SolarEdgeConst {
 		put("supported", 		"version/supported");
 	}};
 	
+	public static Map<String, String> REQUEST_VALUE_PATH_MAP = new HashMap<String, String>() {
+		private static final long serialVersionUID = -5149912712569500179L;
+	{
+		put("energyDetails Production", 		"$.energyDetails.meters[?(@.type=='Production')].values[-1].value");
+		put("energyDetails Consumption", 		"$.energyDetails.meters[?(@.type=='Consumption')].values[-1].value");
+		put("energyDetails SelfConsumption", 	"$.energyDetails.meters[?(@.type=='SelfConsumption')].values[-1].value");
+		put("energyDetails FeedIn", 			"$.energyDetails.meters[?(@.type=='FeedIn')].values[-1].value");
+		put("energyDetails Purchased", 			"$.energyDetails.meters[?(@.type=='Purchased')].values[-1].value");
+		put("powerDetails Production", 			"$.powerDetails.meters[?(@.type=='Production')].values[-1].value");
+		put("powerDetails Consumption", 		"$.powerDetails.meters[?(@.type=='Consumption')].values[-1].value");
+		put("powerDetails SelfConsumption", 	"$.powerDetails.meters[?(@.type=='SelfConsumption')].values[-1].value");
+		put("powerDetails FeedIn", 				"$.powerDetails.meters[?(@.type=='FeedIn')].values[-1].value");
+		put("powerDetails Purchased", 			"$.powerDetails.meters[?(@.type=='Purchased')].values[-1].value");
+		put("storageData power", 				"$.storageData.batteries[0].telemetries[-1].power");
+		put("storageData batteryState", 		"$.storageData.batteries[0].telemetries[-1].batteryState");
+		put("storageData lifeTimeEnergyDischarged", "$.storageData.batteries[0].telemetries[-1].lifeTimeEnergyCharged");
+		put("storageData stateOfCharge", 		"$.storageData.batteries[0].telemetries[-1].stateOfCharge");
+	}};
+	
+	public static Map<String, String> REQUEST_TIME_PATH_MAP = new HashMap<String, String>() {
+		private static final long serialVersionUID = 6752201577661088822L;
+	{
+		put("energyDetails Production", 		"$.energyDetails.meters[?(@.type=='Production')].values[-1].date");
+		put("energyDetails Consumption", 		"$.energyDetails.meters[?(@.type=='Consumption')].values[-1].date");
+		put("energyDetails SelfConsumption", 	"$.energyDetails.meters[?(@.type=='SelfConsumption')].values[-1].date");
+		put("energyDetails FeedIn", 			"$.energyDetails.meters[?(@.type=='FeedIn')].values[-1].date");
+		put("energyDetails Purchased", 			"$.energyDetails.meters[?(@.type=='Purchased')].values[-1].date");
+		put("powerDetails Production", 			"$.powerDetails.meters[?(@.type=='Production')].values[-1].date");
+		put("powerDetails Consumption", 		"$.powerDetails.meters[?(@.type=='Consumption')].values[-1].date");
+		put("powerDetails SelfConsumption", 	"$.powerDetails.meters[?(@.type=='SelfConsumption')].values[-1].date");
+		put("powerDetails FeedIn", 				"$.powerDetails.meters[?(@.type=='FeedIn')].values[-1].date");
+		put("powerDetails Purchased", 			"$.powerDetails.meters[?(@.type=='Purchased')].values[-1].date");
+		put("storageData power", 				"$.storageData.batteries[0].telemetries[-1].timeStamp");
+		put("storageData batteryState", 		"$.storageData.batteries[0].telemetries[-1].timeStamp");
+		put("storageData lifeTimeEnergyDischarged", "$.storageData.batteries[0].telemetries[-1].timeStamp");
+		put("storageData stateOfCharge", 		"$.storageData.batteries[0].telemetries[-1].timeStamp");
+	}};
+	
 	public static String QUARTER_OF_AN_HOUR = "QUARTER_OF_AN_HOUR";
 	
 	public static Map<String, Long> TIME_UNIT_MAP = new HashMap<String, Long>() {
