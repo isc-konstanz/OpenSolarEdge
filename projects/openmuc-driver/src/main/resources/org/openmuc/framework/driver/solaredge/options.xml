@@ -2,8 +2,12 @@
 <configuration>
   <driver id="solaredge">
     <name>SolarEdge</name>
-    <description><![CDATA[Uses the server api of: <img src="https://github.com/isc-konstanz/OpenSolarEdge/blob/master/doc/img/SolarEdge_logo.svg.png?raw=true" 
-    height="32" width="160" "alt="Solar Edge"><br>
+    <description><![CDATA[
+        <a href="http://solaredge.com">
+          <img src="https://isc-konstanz.github.io/OpenSolarEdge/img/solaredge-logo.png" 
+               height="32" width="160" "alt="SolarEdge">
+        </a><br>
+        This driver implements the access to the SolarEdge Cloud-Based Monitoring Platform.
       ]]>
     </description>
     
