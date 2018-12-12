@@ -67,8 +67,8 @@ public class SolarEdgeConst {
 		put("powerDetails Purchased", 			"$.powerDetails.meters[?(@.type=='Purchased')].values[-1].value");
 		put("storageData power", 				"$.storageData.batteries[0].telemetries[-1].power");
 		put("storageData batteryState", 		"$.storageData.batteries[0].telemetries[-1].batteryState");
-		put("storageData lifeTimeEnergyDischarged", "$.storageData.batteries[0].telemetries[-1].lifeTimeEnergyCharged");
-		put("storageData stateOfCharge", 		"$.storageData.batteries[0].telemetries[-1].stateOfCharge");
+		put("storageData lifeTimeEnergyDischarged", "$.storageData.batteries[0].telemetries[-1].lifeTimeEnergyDischarged");
+		put("storageData batteryPercentageState", "$.storageData.batteries[0].telemetries[-1].batteryPercentageState");
 	}};
 	
 	public static Map<String, String> REQUEST_TIME_PATH_MAP = new HashMap<String, String>() {

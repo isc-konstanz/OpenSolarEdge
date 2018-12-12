@@ -30,6 +30,7 @@ import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.framework.driver.solaredge.settings.DeviceSettings;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
+import org.openmuc.framework.driver.spi.DriverDeviceScanListener;
 import org.openmuc.framework.driver.spi.DriverService;
 import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.solaredge.SolarEdgeConfig;
@@ -75,6 +76,11 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 
 	protected SolarEdgeConnection createConnection(DeviceAddress address) {
 		return new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
+	}
+	
+	@Override
+	public void scanForDevices(final String settingsStr, final DriverDeviceScanListener listener) {
+		
 	}
 	
 	@Override

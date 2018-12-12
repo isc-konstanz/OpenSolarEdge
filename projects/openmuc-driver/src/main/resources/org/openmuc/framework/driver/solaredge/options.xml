@@ -83,7 +83,7 @@
           <item value="storageData power">Battery Power</item>
           <item value="storageData batteryState">Battery State</item>
           <item value="storageData lifeTimeEnergyDischarged">Energy discharged from Battery</item>
-          <item value="storageData stateOfCharge">Battery state of charge as percentage of the available capacity</item>
+          <item value="storageData batteryPercentageState">Battery state of charge as percentage of the available capacity</item>
         </selection>
       </option>
     </channelAddress>

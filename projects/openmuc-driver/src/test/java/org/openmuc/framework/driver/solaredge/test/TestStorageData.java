@@ -33,55 +33,55 @@ public class TestStorageData {
 			"\"timeStamp\": \"2015-10-13 08:00:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:05:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:10:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:15:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:20:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:25:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:30:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:35:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"},\r\n" + 
 			"{\r\n" + 
 			"\"timeStamp\": \"2015-10-13 08:40:00\",\r\n" + 
 			"\"power\": 12,\r\n" + 
 			"\"batteryState\": 3,\r\n" + 
-			"\"lifeTimeEnergyCharged\": 6\r\n" + 
+			"\"lifeTimeEnergyDischarged\": 6\r\n" + 
 			"}\r\n" + 
 			"]\r\n" + 
 			"}\r\n" + 
