@@ -22,6 +22,7 @@ package org.openmuc.solaredge;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -96,6 +97,7 @@ public class SolarEdgeResponseHandler {
 			String serialNumber) throws ParseException {
 		valuePath = replaceSerialNumberInPath(valuePath, serialNumber);
 		timePath = replaceSerialNumberInPath(timePath, serialNumber);
+		TimeValue timeValuePair = null;
 		String requestKey = getRequestKey(valuePath);
 		ResponseMapKey responseMapKey = new ResponseMapKey(requestKey, time, timeUnit);
 		JsonResponse response = responseMap.get(responseMapKey);
@@ -116,20 +118,42 @@ public class SolarEdgeResponseHandler {
 			}
 			catch (Exception ex) {
 				ex.printStackTrace();
+				return new TimeValue(null, time.getTime());
 			}
-			//Attention: For time see method getParameters
-			responseMapKey.endTime = time;			
-			responseMap.put(responseMapKey, response);
-		}	
-		TimeValue timeValuePair = null;
+			removeLastResponseFromResponseMap(responseMapKey);
+			timeValuePair = getTimeValuePair(response, valuePath, timePath);
+			if (timeValuePair.getValue() != null) {
+				//Attention: For time see method getParameters
+				responseMapKey.endTime = time;
+				responseMap.put(responseMapKey, response);
+			}
+			return timeValuePair;
+		}
+		timeValuePair = getTimeValuePair(response, valuePath, timePath);
+		return timeValuePair;
+	}
+	
+	private TimeValue getTimeValuePair(JsonResponse response, String valuePath, String timePath) throws ParseException {
 		if (timePath != null) {
-			timeValuePair = response.getTimeValueWithTimePath(valuePath, timePath, 
+			return response.getTimeValueWithTimePath(valuePath, timePath, 
 					SolarEdgeConst.TIME_FORMAT);
 		}
 		else {				
-			timeValuePair = response.getTimeValueWithTime(valuePath, time.getTime());
+			return response.getTimeValueWithTime(valuePath, time.getTime());
 		}
-		return timeValuePair;
+		
+	}
+	
+	private void removeLastResponseFromResponseMap(ResponseMapKey responseMapKey) {
+		Iterator<ResponseMapKey> it = responseMap.keySet().iterator();
+		while (it.hasNext()) {
+			ResponseMapKey next = it.next();
+			if (responseMapKey.requestKey.equals(next.requestKey) &&
+				responseMapKey.timeUnit.equals(next.timeUnit)) {
+				responseMap.remove(next);
+				return;
+			}			
+		}
 	}
 	
 	private HttpRequestParameters getParameters(String requestKey, String timeUnit) throws ParseException {
