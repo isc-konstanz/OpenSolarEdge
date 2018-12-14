@@ -1,0 +1,180 @@
+{
+    "name": "Battery",
+    "category": "Battery",
+    "group": "Solar Edge",
+    "description": "Solar Edge Storage-Battery Information",
+
+    "driver": "solaredge",
+    "devices": [
+        {
+            "description": "Solar Edge Battery"
+        }
+    ],
+    "scan": true,
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "Http Address of Solar Edge",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "siteId",
+            "name": "Site Id",
+            "description": "The site identifier",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "authentication",
+            "name": "Authentication",
+            "description": "Authentication Key",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceSettings"
+        },
+        {
+            "id": "timeUnit",
+            "name": "Time Unit",
+            "description": "Time Unit for Requests",
+            "type": "selection",
+            "select": [
+                { "name": "5 Minutes", "value": "FIVE_MINUTE" },
+                { "name": "15 Minutes", "value": "QUARTER_OF_AN_HOUR" },
+                { "name": "30 Minutes", "value": "HALF_OF_AN_HOUR" },
+                { "name": "1 Hour", "value": "HOUR" },
+                { "name": "1 Day", "value": "DAY" },
+                { "name": "1 Week", "value": "WEEK" }
+            ],
+			"scan": true,
+            "mandatory": true,
+            "syntax": "channelSettings"
+        },
+        {
+            "id": "serialNumber",
+            "name": "Serial Number",
+            "description": "Serial Number of Battery",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "channelSettings"
+        }
+    ],
+
+    "items": [
+    ],
+
+    "channels": [
+        {
+            "name": "<node>_power",
+            "description": "Power",
+            "address": "storageData power",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_batteryState",
+            "description": "Battery State",
+            "address": "storageData batteryState",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"INTEGER"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_lifeTimeEnergyDischarged",
+            "description": "Life time energy discharged",
+            "address": "storageData lifeTimeEnergyDischarged",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Discharged"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_batteryPercentageState",
+            "description": "Battery Percentage State",
+            "address": "storageData batteryPercentageState",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"%"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Charged"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "<node>",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "State",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES"
+        },
+        {
+            "name": "<node>",
+            "tag": "Discharged",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "Charged",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "%"
+        }
+    ],
+
+    "syntax": [
+    	{
+        	"deviceAddress": {
+            	"keyValue": false,
+        		"separator": ";"
+       		}       
+    	},
+     	{
+        	"deviceSettings": {
+            	"keyValue": true,
+        		"separator": ";"
+       		}       
+    	},
+     	{
+        	"channelSettings": {
+            	"keyValue": true,
+        		"separator": ";"
+       		}       
+    	}
+    	
+    ]
+}

@@ -1,0 +1,194 @@
+{
+    "name": "Energy Details",
+    "category": "Energy",
+    "group": "Solar Edge",
+    "description": "Solar Edge Detailed site energy measurements",
+
+    "driver": "solaredge",
+    "devices": [
+        {
+            "description": "Solar Edge Energy"
+        }
+    ],
+    "scan": true,
+
+    "options": [
+        {
+            "id": "address",
+            "name": "Address",
+            "description": "Http Address of Solar Edge",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "siteId",
+            "name": "Site Id",
+            "description": "The site identifier",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceAddress"
+        },
+        {
+            "id": "authentication",
+            "name": "Authentication",
+            "description": "Authentication Key",
+            "type": "text",
+			"scan": true,
+            "mandatory": true,
+            "syntax": "deviceSettings"
+        },
+        {
+            "id": "timeUnit",
+            "name": "Time Unit",
+            "description": "Time Unit for Requests",
+            "type": "selection",
+            "select": [
+                { "name": "5 Minutes", "value": "FIVE_MINUTE" },
+                { "name": "15 Minutes", "value": "QUARTER_OF_AN_HOUR" },
+                { "name": "30 Minutes", "value": "HALF_OF_AN_HOUR" },
+                { "name": "1 Hour", "value": "HOUR" },
+                { "name": "1 Day", "value": "DAY" },
+                { "name": "1 Week", "value": "WEEK" }
+            ],
+			"scan": true,
+            "mandatory": true,
+            "syntax": "channelSettings"
+        }
+    ],
+
+    "items": [
+    ],
+
+    "channels": [
+        {
+            "name": "<node>_production",
+            "description": "Production",
+            "address": "energyDetails Production",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Production"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_consumption",
+            "description": "Consumption",
+            "address": "energyDetails Consumption",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Consumption"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_selfConsumption",
+            "description": "SelfConsumption",
+            "address": "energyDetails SelfConsumption",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "SelfConsumption"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_feedIn",
+            "description": "FeedIn",
+            "address": "energyDetails FeedIn",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "FeedIn"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_purchased",
+            "description": "Purchased",
+            "address": "energyDetails Purchased",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"Wh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Purchased"}
+                }
+            ]
+        }
+    ],
+
+    "feeds": [
+        {
+            "name": "<node>",
+            "tag": "Production",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "Consumption",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "SelfConsumption",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "FeedIn",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        },
+        {
+            "name": "<node>",
+            "tag": "Purchased",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "Wh"
+        }
+    ],
+
+    "syntax": [
+    	{
+        	"deviceAddress": {
+            	"keyValue": false,
+        		"separator": ";"
+       		}       
+    	},
+     	{
+        	"deviceSettings": {
+            	"keyValue": true,
+        		"separator": ";"
+       		}       
+    	},
+     	{
+        	"channelSettings": {
+            	"keyValue": true,
+        		"separator": ";"
+       		}       
+    	}
+    	
+    ]
+}
