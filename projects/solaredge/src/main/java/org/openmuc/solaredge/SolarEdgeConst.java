@@ -87,7 +87,7 @@ public class SolarEdgeConst {
 		put("storageData power", 				"$.storageData.batteries[0].telemetries[-1].timeStamp");
 		put("storageData batteryState", 		"$.storageData.batteries[0].telemetries[-1].timeStamp");
 		put("storageData lifeTimeEnergyDischarged", "$.storageData.batteries[0].telemetries[-1].timeStamp");
-		put("storageData stateOfCharge", 		"$.storageData.batteries[0].telemetries[-1].timeStamp");
+		put("storageData batteryPercentageState","$.storageData.batteries[0].telemetries[-1].timeStamp");
 	}};
 	
 	public static String QUARTER_OF_AN_HOUR = "QUARTER_OF_AN_HOUR";
