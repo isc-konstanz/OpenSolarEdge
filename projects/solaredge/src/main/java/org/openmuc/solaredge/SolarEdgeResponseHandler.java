@@ -37,6 +37,8 @@ import org.openmuc.solaredge.parameters.SolarEdgeSiteSonsorsParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeStartEndTimeParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeStorageDataParameters;
 import org.openmuc.solaredge.parameters.SolarEdgeTimeFrameEnergyParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.jsonpath.data.TimeValue;
 import org.openmuc.jsonpath.request.HttpRequest;
@@ -57,7 +59,8 @@ import org.openmuc.jsonpath.request.json.JsonResponse;
  * 
  */
 public class SolarEdgeResponseHandler {
-
+	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeResponseHandler.class);
+			
 	private int siteId;
 	private HttpHandler httpHandler;
 	private HttpRequest request;
@@ -112,12 +115,13 @@ public class SolarEdgeResponseHandler {
 			
 			try {
 				HttpRequestAction action = new HttpRequestAction("");
+				logger.debug("Request {}, parameters {}", requestPath, parameters);
 				request = httpHandler.getRequest(requestPath, action, 
 						parameters, HttpRequestMethod.GET);
 				response = httpHandler.onRequest(request);
 			}
 			catch (Exception ex) {
-				ex.printStackTrace();
+				logger.error(ex.toString());
 				return new TimeValue(null, time.getTime());
 			}
 			removeLastResponseFromResponseMap(responseMapKey);

@@ -30,16 +30,19 @@ import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.framework.driver.solaredge.settings.DeviceSettings;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
-import org.openmuc.framework.driver.spi.DriverDeviceScanListener;
 import org.openmuc.framework.driver.spi.DriverService;
 import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.solaredge.SolarEdgeConfig;
 import org.openmuc.solaredge.SolarEdgeHttpFactory;
 import org.osgi.service.component.annotations.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallbacks {
-    protected final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeDriver.class);
+	
+	protected final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
 	protected final Map<Integer, SolarEdgeConnection> connectionsMap;
 	protected HttpHandler httpHandler;
@@ -53,7 +56,9 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 	@Override
 	public Connection connect(String addressStr, String settingsStr) throws ArgumentSyntaxException, ConnectionException {
 
+		logger.debug("Connect SolarEdge device: \"" + addressStr +  "\" length: " + addressStr.length());
         address = info.parse(addressStr, DeviceAddress.class);
+		logger.debug("Connect SolarEdge device settings: \"" + settingsStr +  "\" length: " + settingsStr.length());
         settings = info.parse(settingsStr, DeviceSettings.class);
 		
 		SolarEdgeConnection connection = connectionsMap.get(address.getSiteId());
@@ -76,11 +81,6 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 
 	protected SolarEdgeConnection createConnection(DeviceAddress address) {
 		return new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
-	}
-	
-	@Override
-	public void scanForDevices(final String settingsStr, final DriverDeviceScanListener listener) {
-		
 	}
 	
 	@Override

@@ -23,12 +23,12 @@
         	Url of SolarEdge Site.<br>
         	See: <a href="https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf">
 			SolarEdge Monitoring Server API</a><br><br>
-            <b>Example:http://monitoringapi.solaredge.com/</b> 
+            <b>Example:https://monitoringapi.solaredge.com/</b> 
           ]]>
         </description>
         <mandatory>false</mandatory>
         <type>STRING</type>
-        <default>http://monitoringapi.solaredge.com</default>
+        <default>https://monitoringapi.solaredge.com</default>
       </option>
 
       <option id="siteId">
@@ -116,6 +116,7 @@
           <item value="MONTH">1 Month</item>
           <item value="YEAR">1 Year</item>
         </selection>
+		<default>QUARTER_OF_AN_HOUR</default>        
       </option>
       <option id="serialNumber">
         <name>Serial Number</name>

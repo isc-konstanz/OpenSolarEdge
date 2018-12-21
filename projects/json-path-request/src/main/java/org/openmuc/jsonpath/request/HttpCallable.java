@@ -32,9 +32,13 @@ import java.util.concurrent.Callable;
 
 import org.openmuc.jsonpath.HttpException;
 import org.openmuc.jsonpath.request.json.JsonResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class HttpCallable implements Callable<JsonResponse> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(HttpCallable.class);
 	
 	private final static Charset CHARSET = StandardCharsets.UTF_8;
 //	private final static int CONNECTION_TIMEOUT = 5000;
@@ -68,14 +72,15 @@ public class HttpCallable implements Callable<JsonResponse> {
 	protected JsonResponse get(HttpRequest request) throws IOException {
 		try {
 			URL url = new URL(request.getRequest(CHARSET));
-			System.out.println(url.toString());
-			connection = (HttpURLConnection) url.openConnection();
+			logger.debug(url.toString());
+			HttpURLConnection.setFollowRedirects(true);
+			connection = (HttpURLConnection)url.openConnection();
 			
 			connection.setRequestMethod(request.getMethod().name());
 			connection.setRequestProperty("Charset", CHARSET.name());
 			connection.setRequestProperty("Accept-Charset", CHARSET.name());
 			connection.setRequestProperty("Connection", "Close");
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset="+CHARSET.name());
+			connection.setRequestProperty("Content-Type", "application/json;charset="+CHARSET.name());
 			connection.setRequestProperty("Content-length", "0");
 			
 			connection.setInstanceFollowRedirects(true);
@@ -94,7 +99,8 @@ public class HttpCallable implements Callable<JsonResponse> {
 			}
 			throw new HttpException("HTTP status code " + connection.getResponseCode() + ": " + connection.getResponseMessage());
 		
-		} finally {
+		}
+		finally {
 			try {
 				if (stream != null) {
 					stream.close();

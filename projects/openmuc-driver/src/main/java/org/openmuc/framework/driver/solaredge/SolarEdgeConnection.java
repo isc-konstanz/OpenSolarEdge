@@ -49,8 +49,12 @@ import org.openmuc.jsonpath.data.TimeValue;
 import org.openmuc.solaredge.SolarEdgeConst;
 import org.openmuc.solaredge.SolarEdgeResponseHandler;
 import org.openmuc.solaredge.data.TimeWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SolarEdgeConnection implements Connection {
+	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
+	
     protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
     /**
@@ -107,9 +111,10 @@ public class SolarEdgeConnection implements Connection {
 	}
 	
 	protected Record getRecord(String channelAddress, String channelSettings) {
-         Record record;
+        Record record;
 		try {
-		    ChannelSettings settings = preferences.get(channelSettings, ChannelSettings.class);
+			logger.debug("channelAddress test {}, channelSettings {}", channelAddress, channelSettings);
+			ChannelSettings settings = preferences.get(channelSettings, ChannelSettings.class);
 	    	String timePath = settings.getTimePath(channelAddress);
 	    	String timeUnit = settings.getTimeUnit();
 	    	String valuePath = settings.getValuePath(channelAddress);
@@ -124,6 +129,7 @@ public class SolarEdgeConnection implements Connection {
 	protected Record getRecord(String valuePath, String timePath, String timeUnit, String serialNumber) {
     	Record record;
 		try {
+			logger.debug("valuePath {}, timePath {}, timeUnit {}, serialNumber {}", valuePath, timePath, timeUnit, serialNumber);
 			TimeValue timeValuePair = responseHandler.
 					getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
 	    	record = timeValuePairToRecord(timeValuePair);

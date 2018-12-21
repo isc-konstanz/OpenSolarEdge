@@ -7,10 +7,10 @@
     "driver": "solaredge",
     "devices": [
         {
-            "description": "Solar Edge Energy"
+        	"name": "solaredge",
+            "description": "Solar Edge Connection"
         }
     ],
-    "scan": true,
 
     "options": [
         {
@@ -18,16 +18,15 @@
             "name": "Address",
             "description": "Http Address of Solar Edge",
             "type": "text",
-			"scan": true,
+            "default": "https://monitoringapi.solaredge.com/",
             "mandatory": true,
             "syntax": "deviceAddress"
         },
         {
             "id": "siteId",
             "name": "Site Id",
-            "description": "The site identifier",
+            "description": "The site identifier (number)",
             "type": "text",
-			"scan": true,
             "mandatory": true,
             "syntax": "deviceAddress"
         },
@@ -36,7 +35,6 @@
             "name": "Authentication",
             "description": "Authentication Key",
             "type": "text",
-			"scan": true,
             "mandatory": true,
             "syntax": "deviceSettings"
         },
@@ -46,20 +44,16 @@
             "description": "Time Unit for Requests",
             "type": "selection",
             "select": [
-                { "name": "5 Minutes", "value": "FIVE_MINUTE" },
                 { "name": "15 Minutes", "value": "QUARTER_OF_AN_HOUR" },
                 { "name": "30 Minutes", "value": "HALF_OF_AN_HOUR" },
                 { "name": "1 Hour", "value": "HOUR" },
                 { "name": "1 Day", "value": "DAY" },
                 { "name": "1 Week", "value": "WEEK" }
             ],
-			"scan": true,
-            "mandatory": true,
+            "default": "QUARTER_OF_AN_HOUR",
+            "mandatory": false,
             "syntax": "channelSettings"
         }
-    ],
-
-    "items": [
     ],
 
     "channels": [
@@ -90,7 +84,7 @@
             ]
         },
         {
-            "name": "<node>_selfConsumption",
+            "name": "<node>_selfconsumption",
             "description": "SelfConsumption",
             "address": "energyDetails SelfConsumption",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
@@ -103,7 +97,7 @@
             ]
         },
         {
-            "name": "<node>_feedIn",
+            "name": "<node>_feedin",
             "description": "FeedIn",
             "address": "energyDetails FeedIn",
             "settings": "type:ATTRIBUTE",
@@ -170,25 +164,21 @@
         }
     ],
 
-    "syntax": [
-    	{
-        	"deviceAddress": {
-            	"keyValue": false,
-        		"separator": ";"
-       		}       
+    "syntax": {
+    	"deviceAddress": {
+        	"keyValue": false,
+    		"separator": ";"
     	},
-     	{
-        	"deviceSettings": {
-            	"keyValue": true,
-        		"separator": ";"
-       		}       
+    	"deviceSettings": {
+        	"keyValue": true,
+        	"assignment": "=",
+    		"separator": ";"
     	},
-     	{
-        	"channelSettings": {
-            	"keyValue": true,
-        		"separator": ";"
-       		}       
+    	"channelSettings": {
+        	"keyValue": true,
+        	"assignment": "=",
+    		"separator": ";"
     	}
     	
-    ]
+    }
 }

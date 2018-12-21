@@ -1,8 +1,8 @@
 {
-    "name": "Battery",
-    "category": "Battery",
+    "name": "Power Details",
+    "category": "Power",
     "group": "Solar Edge",
-    "description": "Solar Edge Storage-Battery Information",
+    "description": "Solar Edge Detailed site power measurements",
 
     "driver": "solaredge",
     "devices": [
@@ -53,54 +53,74 @@
             "default": "QUARTER_OF_AN_HOUR",
             "mandatory": false,
             "syntax": "channelSettings"
-        },
-        {
-            "id": "serialNumber",
-            "name": "Serial Number",
-            "description": "Serial Number of Battery",
-            "type": "text",
-            "mandatory": false,
-            "syntax": "channelSettings"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>_power",
-            "description": "Power",
-            "address": "storageData power",
+            "name": "<node>_production",
+            "description": "Production",
+            "address": "powerDetails Production",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
             "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Production"}
                 }
             ]
         },
         {
-            "name": "<node>_discharged",
-            "description": "Discharged energy",
-            "address": "storageData lifeTimeEnergyDischarged",
+            "name": "<node>_consumption",
+            "description": "Consumption",
+            "address": "powerDetails Consumption",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"kWh", "scalingFactor":0.001},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Discharged"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Consumption"}
                 }
             ]
         },
         {
-            "name": "<node>_state",
-            "description": "State of charge",
-            "address": "storageData batteryPercentageState",
+            "name": "<node>_selfconsumption",
+            "description": "SelfConsumption",
+            "address": "powerDetails SelfConsumption",
             "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
-            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"%"},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "SelfConsumption"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_feedin",
+            "description": "FeedIn",
+            "address": "powerDetails FeedIn",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "FeedIn"}
+                }
+            ]
+        },
+        {
+            "name": "<node>_purchased",
+            "description": "Purchased",
+            "address": "powerDetails Purchased",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 5000, "loggingMaxInterval": 180000},
+            "configs": {"samplingInterval": 5000, "valueType":"FLOAT", "unit":"W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Purchased"}
                 }
             ]
         }
@@ -109,31 +129,46 @@
     "feeds": [
         {
             "name": "<node>",
-            "tag": "Power",
+            "tag": "Production",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
         },
         {
             "name": "<node>",
-            "tag": "State",
+            "tag": "Consumption",
             "type": "DataType::REALTIME",
-            "engine": "Engine::PHPTIMESERIES"
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
         },
         {
             "name": "<node>",
-            "tag": "Discharged",
+            "tag": "SelfConsumption",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
-            "unit": "kWh"
+            "unit": "W"
+        },
+        {
+            "name": "<node>",
+            "tag": "FeedIn",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "<node>",
+            "tag": "Purchased",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
         }
     ],
 
     "syntax": {
-    	"deviceAddress": {
+     	"deviceAddress": {
         	"keyValue": false,
     		"separator": ";"
-   		},       
+    	},
     	"deviceSettings": {
         	"keyValue": true,
         	"assignment": "=",
@@ -141,7 +176,7 @@
     	},
     	"channelSettings": {
         	"keyValue": true,
-         	"assignment": "=",
+        	"assignment": "=",
     		"separator": ";"
     	}
     	

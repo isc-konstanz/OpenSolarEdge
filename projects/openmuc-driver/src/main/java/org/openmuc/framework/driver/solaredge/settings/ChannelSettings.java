@@ -28,7 +28,7 @@ public class ChannelSettings extends Preferences {
     public static final PreferenceType TYPE = PreferenceType.SETTINGS_CHANNEL;
 
     @Option
-    private String timeUnit;
+    private String timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
 
     @Option
     private String serialNumber;
@@ -45,7 +45,7 @@ public class ChannelSettings extends Preferences {
     		case "storageData batteryState" :
     		case "storageData lifeTimeEnergyDischarged" :
     		case "storageData stateOfCharge" :
-    			if (serialNumber != null) {
+    			if (serialNumber != null && serialNumber.length() > 0) {
     				if (path.contains("[0]")) {
     					path = path.replaceAll("[0]", "?(@.serialNumber=='@serialNumber')");
     				}
@@ -62,7 +62,7 @@ public class ChannelSettings extends Preferences {
     		case "storageData batteryState" :
     		case "storageData lifeTimeEnergyDischarged" :
     		case "storageData stateOfCharge" :
-    			if (serialNumber != null) {
+    			if (serialNumber != null && serialNumber.length() > 0) {
     				if (path.contains("[0]")) {
     					path = path.replaceAll("[0]", "?(@.serialNumber=='@serialNumber')");
     				}
