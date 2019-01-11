@@ -112,9 +112,16 @@ public class TestStorageData {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].power", 
-					"$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].timeStamp",
-					"FIVE_MINUTE", "BFA");
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].power", 
+						"$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].timeStamp",
+						"FIVE_MINUTE", "BFA");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
  		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 
@@ -162,8 +169,15 @@ public class TestStorageData {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("storageData batteryState", 
-					"timeUnit=FIVE_MINUTE;serialNumber=BFA");
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("storageData batteryState", 
+						"timeUnit=FIVE_MINUTE;serialNumber=BFA");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
  		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 
@@ -211,8 +225,15 @@ public class TestStorageData {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("storageData lifeTimeEnergyDischarged", 
-					"timeUnit=FIVE_MINUTE");
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("storageData lifeTimeEnergyDischarged", 
+						"timeUnit=FIVE_MINUTE");
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
  		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 

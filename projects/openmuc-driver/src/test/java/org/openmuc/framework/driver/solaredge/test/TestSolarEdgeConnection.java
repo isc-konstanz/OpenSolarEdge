@@ -16,11 +16,11 @@ public class TestSolarEdgeConnection extends SolarEdgeConnection {
 		responseHandler = new TestSolarEdgeResponseHandler(siteId, httpHandler);
 	}
 	
-	public Record getRecordForTest(String channelAddress, String channelSettings) {
-		return getRecord(channelAddress, channelSettings);
+	public Record getRecordForTest(String channelAddress, String channelSettings) throws Exception {
+		return getRecord(channelAddress, channelSettings, "");
 	}
 	
-	public Record getRecordForTest(String valuePath, String timePath, String timeUnit, String serialNumber) {
+	public Record getRecordForTest(String valuePath, String timePath, String timeUnit, String serialNumber) throws Exception {
 		return getRecord(valuePath, timePath, timeUnit, serialNumber);
 	}
 	

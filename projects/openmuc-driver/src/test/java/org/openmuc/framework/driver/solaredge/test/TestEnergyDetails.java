@@ -96,8 +96,15 @@ public class TestEnergyDetails {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("$.energyDetails", null, 
-					SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("$.energyDetails", null, 
+						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
 		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 
@@ -150,9 +157,16 @@ public class TestEnergyDetails {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[0].value", 
-					"$.energyDetails.meters[?(@.type=='Production')].values[0].date", 
-					SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[0].value", 
+						"$.energyDetails.meters[?(@.type=='Production')].values[0].date", 
+						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
  		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 
@@ -200,9 +214,16 @@ public class TestEnergyDetails {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[1].value", 
-					"$.energyDetails.meters[?(@.type=='Production')].values[1].date", 
-					SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[1].value", 
+						"$.energyDetails.meters[?(@.type=='Production')].values[1].date", 
+						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
 		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 
@@ -250,7 +271,14 @@ public class TestEnergyDetails {
 			return;
 		}
         
-        Record rec = connection.getRecordForTest("energyDetails Production", "timeUnit="+SolarEdgeConst.QUARTER_OF_AN_HOUR);
+        Record rec;
+		try {
+			rec = connection.getRecordForTest("energyDetails Production", "timeUnit="+SolarEdgeConst.QUARTER_OF_AN_HOUR);
+		} catch (Exception e) {
+			e.printStackTrace();
+			assertTrue(false);
+			return;
+		}
 		HttpRequest request = responseHandler.getRequest();
 		try {
 			String requestStr = request.getRequest(CHARSET); 

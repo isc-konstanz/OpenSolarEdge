@@ -30,4 +30,8 @@ public class HttpGeneralException extends Exception {
 	public HttpGeneralException(String s) {
 		super(s);
 	}
+
+	public HttpGeneralException(String s, Throwable t) {
+		super(s, t);
+	}
 }

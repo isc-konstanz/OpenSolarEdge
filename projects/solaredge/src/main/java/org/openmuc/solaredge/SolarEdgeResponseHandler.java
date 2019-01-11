@@ -97,7 +97,7 @@ public class SolarEdgeResponseHandler {
 	}
 
 	public TimeValue getTimeValuePair(String valuePath, String timePath, String timeUnit,
-			String serialNumber) throws ParseException {
+			String serialNumber) throws Exception {
 		valuePath = replaceSerialNumberInPath(valuePath, serialNumber);
 		timePath = replaceSerialNumberInPath(timePath, serialNumber);
 		TimeValue timeValuePair = null;
@@ -118,11 +118,12 @@ public class SolarEdgeResponseHandler {
 				logger.debug("Request {}, parameters {}", requestPath, parameters);
 				request = httpHandler.getRequest(requestPath, action, 
 						parameters, HttpRequestMethod.GET);
+				SolarEdgeRequestCounter.augmentCounter(System.currentTimeMillis());
 				response = httpHandler.onRequest(request);
 			}
 			catch (Exception ex) {
-				logger.error(ex.toString());
-				return new TimeValue(null, time.getTime());
+				throw ex;
+//				return new TimeValue(null, time.getTime());
 			}
 			removeLastResponseFromResponseMap(responseMapKey);
 			timeValuePair = getTimeValuePair(response, valuePath, timePath);

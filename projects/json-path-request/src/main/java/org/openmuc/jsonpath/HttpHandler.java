@@ -126,15 +126,21 @@ public class HttpHandler implements HttpRequestCallbacks {
 	
 	@Override
 	public JsonResponse onRequest(HttpRequest request) throws HttpGeneralException {
-		JsonResponse response = submitRequest(request);
-		if (response != null) {
-			// TODO is that needed, ask Adrian ?
-//			if (response.isSuccess()) {
-				return response;
-//			}
-//			throw new HttpException("Request responsed \"false\"");
+		try {
+			JsonResponse response = submitRequest(request);
+			if (response != null) {
+				// TODO is that needed, ask Adrian ?
+//				if (response.isSuccess()) {
+					return response;
+//				}
+//				throw new HttpException("Request responsed \"false\"");
+			}
+			throw new HttpGeneralException("Request failed");
 		}
-		throw new HttpGeneralException("Request failed");
+		catch (Exception e) {
+			logger.debug(e.getMessage());
+			throw e;
+		}
 	}
 	
 	protected synchronized JsonResponse submitRequest(HttpRequest request) throws HttpGeneralException {
@@ -159,15 +165,15 @@ public class HttpHandler implements HttpRequestCallbacks {
 				return response;
 			}
 			catch (JsonSyntaxException e) {
-				throw new HttpGeneralException("Received invalid JSON response: " + e);
+				throw new HttpGeneralException("Received invalid JSON response: " + e, e);
 			}
 			catch (CancellationException | TimeoutException e) {
 				submit.cancel(true);
-				throw new HttpGeneralException("Aborted request \"" + request.toString() + "\": " + e);
+				throw new HttpGeneralException("Aborted request \"" + request.toString() + "\": " + e, e);
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			initialize();
-			throw new HttpGeneralException("Communication failed: " + e);
+			throw new HttpGeneralException("Communication failed: " + e, e);
 		}
 	}
 	
