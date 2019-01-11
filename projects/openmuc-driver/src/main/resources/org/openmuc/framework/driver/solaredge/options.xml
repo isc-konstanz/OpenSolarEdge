@@ -10,7 +10,7 @@
         This driver implements the access to the SolarEdge Cloud-Based Monitoring Platform.
       ]]>
     </description>
-    
+
     <deviceAddress>
       <syntax>
         <keyValue>false</keyValue>
@@ -18,9 +18,9 @@
       </syntax>
 
       <option id="address">
-        <name>Url of SolarEdge Site</name>
+        <name>Server address</name>
         <description><![CDATA[
-        	Url of SolarEdge Site.<br>
+        	Address of the SolarEdge Server.<br>
         	See: <a href="https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf">
 			SolarEdge Monitoring Server API</a><br><br>
             <b>Example:https://monitoringapi.solaredge.com/</b> 
@@ -32,9 +32,9 @@
       </option>
 
       <option id="siteId">
-        <name>Site Id</name>
+        <name>Site ID</name>
         <description><![CDATA[
-        	Site Id of SolarEdge Site.<br><br>
+        	The site identifier.
           ]]>
         </description>
         <mandatory>true</mandatory>
@@ -51,7 +51,7 @@
       <option id="authentication">
         <name>Authentication</name>
         <description><![CDATA[
-        	Authentication for access the site.<br><br>
+        	Valid <b>API Key</b> to authenticate access to the selected site.
           ]]>
         </description>
         <mandatory>true</mandatory>
@@ -65,25 +65,25 @@
       </syntax>
       <option id="request">
         <name>Request</name>
-        <description>Requested value</description>
+        <description>Request value</description>
         <mandatory>true</mandatory>
         <type>STRING</type>
         <selection>
           <validate>false</validate>
-          <item value="energyDetails Production">Production energy meter</item>
-          <item value="energyDetails Consumption">Consumption energy meter</item>
-          <item value="energyDetails SelfConsumption">Virtual energy self-consumption</item>
-          <item value="energyDetails FeedIn">Export energy to GRID meter</item>
-          <item value="energyDetails Purchased">Import energy from GRID meter</item>
-          <item value="powerDetails Production">AC Production power meter</item>
-          <item value="powerDetails Consumption">Consumption power meter</item>
-          <item value="powerDetails SelfConsumption">Virtual power self-consumption</item>
-          <item value="powerDetails FeedIn">Export power to GRID meter</item>
-          <item value="powerDetails Purchased">Import power from GRID meter</item>
+          <item value="energyDetails Production">Production energy</item>
+          <item value="energyDetails Consumption">Consumption energy</item>
+          <item value="energyDetails SelfConsumption">self-consumption energy</item>
+          <item value="energyDetails FeedIn">Export energy</item>
+          <item value="energyDetails Purchased">Import energy</item>
+          <item value="powerDetails Production">Production power</item>
+          <item value="powerDetails Consumption">Consumption power</item>
+          <item value="powerDetails SelfConsumption">Self-consumption power</item>
+          <item value="powerDetails FeedIn">Export power</item>
+          <item value="powerDetails Purchased">Import power</item>
           <item value="storageData power">Battery Power</item>
           <item value="storageData batteryState">Battery State</item>
-          <item value="storageData lifeTimeEnergyDischarged">Energy discharged from Battery</item>
-          <item value="storageData batteryPercentageState">Battery state of charge as percentage of the available capacity</item>
+          <item value="storageData lifeTimeEnergyDischarged">Battery discharged energy</item>
+          <item value="storageData batteryPercentageState">Battery state of charge</item>
         </selection>
       </option>
     </channelAddress>
@@ -95,12 +95,12 @@
       </syntax>
 
      <option id="timeUnit">
-        <name>Time Unit</name>
+        <name>Time unit</name>
         <description><![CDATA[
-            <br>Time difference until this channel sends a next http request.<br>
-			The Time Unit can depend on the http request send. For detailed information 
+            Time waited until a next http request is made.<br>
+			The time unit can depend on the request sent. For detailed information 
 			see <a href="https://www.solaredge.com/sites/default/files/se_monitoring_api.pdf">
-			SolarEdge Monitoring Server API</a>          
+			SolarEdge Monitoring Server API</a>
           ]]>
         </description>
         <mandatory>false</mandatory>
@@ -121,9 +121,9 @@
       <option id="serialNumber">
         <name>Serial Number</name>
         <description><![CDATA[
-            The Serial Number of the channel device only for Inverter Technical 
-            Data, Equipment Change Log, Storage Data reuqests<br><br>            
-            <b>Example:12345678-90</b> 
+            The serial number of the inverter.<br>
+            <i>Only necessary for technical data</i><br><br>
+            <b>Example:12345678-90</b>
           ]]>
         </description>
         <mandatory>false</mandatory>

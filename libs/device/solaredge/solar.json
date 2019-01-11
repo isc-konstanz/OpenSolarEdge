@@ -1,8 +1,8 @@
 {
-    "name": "Battery",
+    "name": "Solar",
     "category": "Inverter",
     "group": "SolarEdge",
-    "description": "SolarEdge battery details",
+    "description": "SolarEdge solar details",
 
     "driver": "solaredge",
     "devices": [
@@ -53,48 +53,27 @@
             "default": "QUARTER_OF_AN_HOUR",
             "mandatory": false,
             "syntax": "channelSettings"
-        },
-        {
-            "id": "serialNumber",
-            "name": "Serial Number",
-            "description": "Serial Number of the battery",
-            "type": "text",
-            "mandatory": false,
-            "syntax": "channelSettings"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>*state",
-            "description": "Battery state of charge",
-            "address": "storageData batteryPercentageState",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
-            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"%"},
-            "processList": [
-                {
-                    "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
-                }
-            ]
-        },
-        {
-            "name": "<node>*discharged",
-            "description": "Battery discharged energy",
-            "address": "storageData lifeTimeEnergyDischarged",
+            "name": "<node>*energy",
+            "description": "Photovoltaic energy",
+            "address": "energyDetails Production",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
             "configs": {"samplingInterval": 60000, "scalingFactor": 0.001, "valueType":"DOUBLE", "unit":"kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*discharged", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Energy"}
                 }
             ]
         },
         {
             "name": "<node>*power",
-            "description": "Battery charging power",
-            "address": "storageData power",
+            "description": "Photovoltaic power",
+            "address": "powerDetails Production",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
             "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"W"},
             "processList": [
@@ -109,12 +88,6 @@
     "feeds": [
         {
             "name": "<node>",
-            "tag": "State",
-            "type": "DataType::REALTIME",
-            "engine": "Engine::PHPTIMESERIES"
-        },
-        {
-            "name": "<node>*discharged",
             "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
@@ -133,7 +106,7 @@
         "deviceAddress": {
             "keyValue": false,
             "separator": ";"
-           },       
+        },
         "deviceSettings": {
             "keyValue": true,
             "assignment": "=",
@@ -141,9 +114,8 @@
         },
         "channelSettings": {
             "keyValue": true,
-             "assignment": "=",
+            "assignment": "=",
             "separator": ";"
         }
-        
     }
 }
