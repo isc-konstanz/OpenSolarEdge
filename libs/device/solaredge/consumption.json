@@ -1,8 +1,8 @@
 {
-    "name": "Battery",
+    "name": "Consumption",
     "category": "Inverter",
     "group": "SolarEdge",
-    "description": "SolarEdge battery details",
+    "description": "SolarEdge consumption details",
 
     "driver": "solaredge",
     "devices": [
@@ -53,48 +53,55 @@
             "default": "QUARTER_OF_AN_HOUR",
             "mandatory": false,
             "syntax": "channelSettings"
-        },
-        {
-            "id": "serialNumber",
-            "name": "Serial Number",
-            "description": "Serial Number of the battery",
-            "type": "text",
-            "mandatory": false,
-            "syntax": "channelSettings"
         }
     ],
 
     "channels": [
         {
-            "name": "<node>*state",
-            "description": "Battery state of charge",
-            "address": "storageData batteryPercentageState",
-            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
-            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"%"},
-            "processList": [
-                {
-                    "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
-                }
-            ]
-        },
-        {
-            "name": "<node>*discharged",
-            "description": "Battery discharged energy",
-            "address": "storageData lifeTimeEnergyDischarged",
+            "name": "<node>*energy",
+            "description": "Consumption",
+            "address": "energyDetails Consumption",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
             "configs": {"samplingInterval": 60000, "scalingFactor": 0.001, "valueType":"DOUBLE", "unit":"kWh"},
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*discharged", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Energy"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*export*energy",
+            "description": "Grid export",
+            "address": "energyDetails FeedIn",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "scalingFactor": 0.001, "valueType":"DOUBLE", "unit":"kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Energy"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*import",
+            "description": "Grid import",
+            "address": "energyDetails Purchased",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "scalingFactor": 0.001, "valueType":"DOUBLE", "unit":"kWh"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Energy"}
                 }
             ]
         },
         {
             "name": "<node>*power",
-            "description": "Battery charging power",
-            "address": "storageData power",
+            "description": "Consumption",
+            "address": "powerDetails Consumption",
             "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
             "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"W"},
             "processList": [
@@ -103,18 +110,54 @@
                     "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
                 }
             ]
+        },
+        {
+            "name": "<node>*export*power",
+            "description": "Grid export",
+            "address": "powerDetails FeedIn",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*export", "tag": "Power"}
+                }
+            ]
+        },
+        {
+            "name": "<node>*import*power",
+            "description": "Grid import",
+            "address": "powerDetails Purchased",
+            "settings": "type:ATTRIBUTE",
+            "logging": {"loggingInterval": 60000, "loggingMaxInterval": 900000},
+            "configs": {"samplingInterval": 60000, "valueType":"DOUBLE", "unit":"W"},
+            "processList": [
+                {
+                    "process": "log_to_feed",
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*import", "tag": "Power"}
+                }
+            ]
         }
     ],
 
     "feeds": [
         {
             "name": "<node>",
-            "tag": "State",
+            "tag": "Energy",
             "type": "DataType::REALTIME",
-            "engine": "Engine::PHPTIMESERIES"
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
         },
         {
-            "name": "<node>*discharged",
+            "name": "<node>*export",
+            "tag": "Energy",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "kWh"
+        },
+        {
+            "name": "<node>*import",
             "tag": "Energy",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
@@ -126,6 +169,20 @@
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
+        },
+        {
+            "name": "<node>*export",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
+        },
+        {
+            "name": "<node>*import",
+            "tag": "Power",
+            "type": "DataType::REALTIME",
+            "engine": "Engine::PHPTIMESERIES",
+            "unit": "W"
         }
     ],
 
@@ -133,7 +190,7 @@
         "deviceAddress": {
             "keyValue": false,
             "separator": ";"
-           },       
+        },
         "deviceSettings": {
             "keyValue": true,
             "assignment": "=",
@@ -141,9 +198,8 @@
         },
         "channelSettings": {
             "keyValue": true,
-             "assignment": "=",
+            "assignment": "=",
             "separator": ";"
         }
-        
     }
 }
