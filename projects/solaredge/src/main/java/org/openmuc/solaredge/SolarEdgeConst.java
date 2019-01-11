@@ -55,6 +55,8 @@ public class SolarEdgeConst {
 	public static Map<String, String> REQUEST_VALUE_PATH_MAP = new HashMap<String, String>() {
 		private static final long serialVersionUID = -5149912712569500179L;
 	{
+		put("details name", 					"$.details.name");
+
 		put("energyDetails Production", 		"$.energyDetails.meters[?(@.type=='Production')].values[-1].value");
 		put("energyDetails Consumption", 		"$.energyDetails.meters[?(@.type=='Consumption')].values[-1].value");
 		put("energyDetails SelfConsumption", 	"$.energyDetails.meters[?(@.type=='SelfConsumption')].values[-1].value");

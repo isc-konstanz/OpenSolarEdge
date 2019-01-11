@@ -32,8 +32,11 @@ import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.DriverService;
 import org.openmuc.jsonpath.HttpHandler;
+import org.openmuc.jsonpath.data.TimeValue;
 import org.openmuc.solaredge.SolarEdgeConfig;
+import org.openmuc.solaredge.SolarEdgeConst;
 import org.openmuc.solaredge.SolarEdgeHttpFactory;
+import org.openmuc.solaredge.SolarEdgeResponseHandler;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +73,14 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 			connection = createConnection(address);
 			connectionsMap.put(address.getSiteId(), connection);
 			httpHandler.start();
+		}
+		SolarEdgeResponseHandler responseHandler = connection.getResponseHandler();
+		try {
+			TimeValue timeValue = responseHandler.getTimeValuePair(SolarEdgeConst.REQUEST_VALUE_PATH_MAP.get("details name"), null, "YEAR", null);
+			logger.info("Connected to " + timeValue.getValue());
+		}
+		catch (Exception e) {
+			throw new ConnectionException("Get Site Details Failed", e);
 		}
 
 		return connection;
