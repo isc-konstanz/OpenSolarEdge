@@ -73,6 +73,39 @@ public class TestEnergyDetails {
     		"}\r\n" + 
     		"}";
 	
+	static String jsonConnectString =  "{\r\n" + 
+			"\"details\":{\r\n" + 
+			"\"id\":0,\r\n" + 
+			"\"name\":\"site name\",\r\n" + 
+			"\"accountId\":0,\r\n" + 
+			"\"status\":\"Active\",\r\n" + 
+			"\"peakPower\":9.8,\r\n" + 
+			"\"currency\":\"EUR\",\r\n" + 
+			"\"installationDate\":\"2012-08-16 00:00:00\",\r\n" + 
+			"\"ptoDate\":\"2017-05-11\",\r\n" + 
+			"\"notes\":\"my notes\",\r\n" + 
+			"\"type\":\"Optimizers & Inverters\",\r\n" + 
+			"\"location\":{\r\n" + 
+			"\"country\":\"my country\",\r\n" + 
+			"\"state\":\"my state\",\r\n" + 
+			"\"city\":\"my city\",\r\n" + 
+			"\"address\":\"my address\",\r\n" + 
+			"\"address2\":\"\",\r\n" + 
+			"\"zip\":\"0000\",\r\n" + 
+			"\"timeZone\":\"GMT\"\r\n" + 
+			"},\r\n" + 
+			"\"alertQuantity\":0,\r\n" + 
+			"\"alertSeverity\":\"NONE\",\r\n" + 
+			"\"uris\":{\r\n" + 
+			"\"IMAGE_URI\":\"site image uri\"\r\n" + 
+			"},\r\n" + 
+			"\"publicSettings\":{\r\n" + 
+			"\"name\":null,\r\n" + 
+			"\"isPublic\":false\r\n" + 
+			"}\r\n" + 
+			"}\r\n" + 
+			"}";
+	
 	static final String ADDRESS = "https://monitoringapi.solaredge.com;249379";
     static final String SETTINGS = "authentication=L4QLVQ1LOKCQX2193VSEICXW61NP6B1O";
 
@@ -84,7 +117,7 @@ public class TestEnergyDetails {
         String testMethodName = "test_EnergyDetailsJsonGetEnergyDetails";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonString);
+        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
         TestSolarEdgeResponseHandler responseHandler = null;
         TestSolarEdgeConnection connection = null;
         try {
@@ -145,7 +178,7 @@ public class TestEnergyDetails {
         String testMethodName = "test_EnergyDetailsJsonGetProductionValue0";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonString);
+        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
         TestSolarEdgeResponseHandler responseHandler = null;
         TestSolarEdgeConnection connection = null;
         try {
@@ -202,7 +235,7 @@ public class TestEnergyDetails {
         String testMethodName = "test_EnergyDetailsJsonGetProductionValue1";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonString);
+        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
         TestSolarEdgeResponseHandler responseHandler = null;
         TestSolarEdgeConnection connection = null;
         try {
@@ -259,7 +292,7 @@ public class TestEnergyDetails {
         String testMethodName = "test_EnergyDetailsJsonGetProductionValueLast";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonString);
+        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
         TestSolarEdgeResponseHandler responseHandler = null;
         TestSolarEdgeConnection connection = null;
         try {
