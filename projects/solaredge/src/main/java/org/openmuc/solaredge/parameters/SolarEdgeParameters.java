@@ -32,7 +32,6 @@ public class SolarEdgeParameters {
 	protected String nowTimeFormat = SolarEdgeConst.TIME_FORMAT;
 
 	public HttpRequestParameters getParameters() throws ParseException {
-		addParameters();
 		return parameters;
 	}
 	

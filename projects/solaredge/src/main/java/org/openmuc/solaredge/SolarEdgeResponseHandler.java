@@ -22,7 +22,6 @@ package org.openmuc.solaredge;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -40,6 +39,7 @@ import org.openmuc.solaredge.parameters.SolarEdgeTimeFrameEnergyParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openmuc.jsonpath.HttpHandler;
+import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.TimeValue;
 import org.openmuc.jsonpath.request.HttpRequest;
 import org.openmuc.jsonpath.request.HttpRequestAction;
@@ -65,7 +65,8 @@ public class SolarEdgeResponseHandler {
 	private HttpHandler httpHandler;
 	private HttpRequest request;
 	private Map<ResponseMapKey, JsonResponse> responseMap = new HashMap<ResponseMapKey, JsonResponse>();
-	protected TimeWrapper time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT);
+	protected Map<ResponseMapKey, TimeWrapper> requestTimeMap = new HashMap<ResponseMapKey, TimeWrapper>();
+//	protected TimeWrapper time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT);
 	protected TimeWrapper lastTime;
 	
 	protected SolarEdgeResponseHandler() {
@@ -96,22 +97,30 @@ public class SolarEdgeResponseHandler {
 		return request;
 	}
 
-	public TimeValue getTimeValuePair(String valuePath, String timePath, String timeUnit,
-			String serialNumber) throws Exception {
+	public TimeValue getTimeValuePair(String valuePath, String timePath, final String timeUnit,
+			final String serialNumber) throws Exception {
 		valuePath = replaceSerialNumberInPath(valuePath, serialNumber);
 		timePath = replaceSerialNumberInPath(timePath, serialNumber);
 		TimeValue timeValuePair = null;
 		String requestKey = getRequestKey(valuePath);
-		ResponseMapKey responseMapKey = new ResponseMapKey(requestKey, time, timeUnit);
+		ResponseMapKey responseMapKey = createResponseMapKey(requestKey, timeUnit);
 		JsonResponse response = responseMap.get(responseMapKey);
+		TimeWrapper time = requestTimeMap.get(responseMapKey);
+		if (time == null) {
+			time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT);
+		}
 		if (response == null || 
 			isOlderThanLastTimeUnit(time.getTime(), 
 					SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit))) {			
 			// Send Request and get record from response
 			String requestPath = getRequestPath(requestKey, serialNumber);
 			// Attention: Member time is refreshed in this method getParameters
-			HttpRequestParameters parameters = 
-					getParameters(requestKey, timeUnit);
+			SolarEdgeParameters params = getParameters(requestKey, timeUnit, time);
+			if (params.getTimeWrapperNow()!=null) {
+				time = params.getTimeWrapperNow();
+			}
+			requestTimeMap.put(responseMapKey, time);
+			HttpRequestParameters parameters = params.getParameters();
 			
 			try {
 				HttpRequestAction action = new HttpRequestAction("");
@@ -125,43 +134,29 @@ public class SolarEdgeResponseHandler {
 				throw ex;
 //				return new TimeValue(null, time.getTime());
 			}
-			removeLastResponseFromResponseMap(responseMapKey);
-			timeValuePair = getTimeValuePair(response, valuePath, timePath);
+			timeValuePair = getTimeValuePair(response, valuePath, timePath, time.getTime());
 			if (timeValuePair.getValue() != null) {
-				//Attention: For time see method getParameters
-				responseMapKey.endTime = time;
 				responseMap.put(responseMapKey, response);
 			}
 			return timeValuePair;
 		}
-		timeValuePair = getTimeValuePair(response, valuePath, timePath);
+		timeValuePair = getTimeValuePair(response, valuePath, timePath, time.getTime());
 		return timeValuePair;
 	}
 	
-	private TimeValue getTimeValuePair(JsonResponse response, String valuePath, String timePath) throws ParseException {
+	private TimeValue getTimeValuePair(JsonResponse response, String valuePath, String timePath, Long time) 
+			throws ParseException, HttpGeneralException {
 		if (timePath != null) {
 			return response.getTimeValueWithTimePath(valuePath, timePath, 
 					SolarEdgeConst.TIME_FORMAT);
 		}
 		else {				
-			return response.getTimeValueWithTime(valuePath, time.getTime());
+			return response.getTimeValueWithTime(valuePath, time);
 		}
 		
 	}
 	
-	private void removeLastResponseFromResponseMap(ResponseMapKey responseMapKey) {
-		Iterator<ResponseMapKey> it = responseMap.keySet().iterator();
-		while (it.hasNext()) {
-			ResponseMapKey next = it.next();
-			if (responseMapKey.requestKey.equals(next.requestKey) &&
-				responseMapKey.timeUnit.equals(next.timeUnit)) {
-				responseMap.remove(next);
-				return;
-			}			
-		}
-	}
-	
-	private HttpRequestParameters getParameters(String requestKey, String timeUnit) throws ParseException {
+	private SolarEdgeParameters getParameters(String requestKey, String timeUnit, TimeWrapper time) throws ParseException {
 		SolarEdgeParameters params;
 		if (requestKey.equals("energy")) {
 			params = new SolarEdgeEnergyParameters(time, timeUnit);
@@ -193,19 +188,17 @@ public class SolarEdgeResponseHandler {
 			// list-, Inventory-, SiteSensors-, version-, supported-requests 
 			params = new SolarEdgeParameters();
 		}
-		HttpRequestParameters parameters = params.getParameters();
+		params.addParameters();
 		if (params instanceof SolarEdgeStartEndTimeParameters) {
 			lastTime = ((SolarEdgeStartEndTimeParameters)params).getLastTime();
 		}
 		else {
 			lastTime = time;
-		}			
-		time = params.getTimeWrapperNow();
-		
-		return parameters;
+		}
+		return params;
 	}
 	
-	private String getRequestKey(String valuePath) {
+	protected String getRequestKey(String valuePath) {
 		StringTokenizer tokenizer = new StringTokenizer(valuePath, ".");
 		tokenizer.nextToken();
 		return tokenizer.nextToken();
@@ -232,7 +225,7 @@ public class SolarEdgeResponseHandler {
 		}
 		return retval;
 	}
-
+	
 	private String replaceSerialNumberInPath(String path, String serialNumber) {
 		String retval = path;
 		if (path != null && path.contains(SolarEdgeConst.SERIAL_NUMBER)) {
@@ -243,22 +236,23 @@ public class SolarEdgeResponseHandler {
 
 	private boolean isOlderThanLastTimeUnit(long lastTime, long timeUnit) {
 		long currentTime = System.currentTimeMillis();
-		
 		return lastTime + timeUnit < currentTime;
+	}
+	
+	protected ResponseMapKey createResponseMapKey(String requestKey, String timeUnit) {
+		return new ResponseMapKey(requestKey, timeUnit);
 	}
 	
 	class ResponseMapKey {
 		
 		String requestKey;
-		TimeWrapper endTime;
 		String timeUnit;
 
-		public ResponseMapKey(String requestKey, TimeWrapper endTime, String timeUnit) {
-			if (requestKey == null || endTime == null || timeUnit == null) {
+		public ResponseMapKey(String requestKey, String timeUnit) {
+			if (requestKey == null || timeUnit == null) {
 				throw new InvalidParameterException();
 			}
 			this.requestKey = requestKey;
-			this.endTime = endTime;
 			this.timeUnit = timeUnit;
 		}
 		
@@ -270,17 +264,14 @@ public class SolarEdgeResponseHandler {
 				ResponseMapKey key = (ResponseMapKey)obj;
 				retval = this.requestKey.equals(key.requestKey);
 				if (retval) {
-					retval = this.endTime.equals(key.endTime);
-					if (retval) {
-						retval = this.timeUnit.equals(key.timeUnit);
-					}
+					retval = this.timeUnit.equals(key.timeUnit);
 				}
 			}						
 			return retval;
 		}
 		@Override
 		public int hashCode() {
-			String str = this.requestKey + endTime.getTimeStr() + this.timeUnit;
+			String str = this.requestKey + this.timeUnit;
 			return str.hashCode();			
 		}
 	}

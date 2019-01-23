@@ -20,7 +20,9 @@
 package org.openmuc.framework.driver.solaredge;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.openmuc.framework.config.ArgumentSyntaxException;
@@ -58,6 +60,9 @@ public class SolarEdgeConnection implements Connection {
 	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
 	
     protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+    
+    private Map<String, Long> nullValueMap = new HashMap<String, Long>();
+    private Map<String, TimeValue> lastTimeValueMap = new HashMap<String, TimeValue>();
     
     /**
      * Interface used by {@link SolarEdgeConnection} to notify the {@link SolarEdgeDriver} about events
@@ -136,8 +141,24 @@ public class SolarEdgeConnection implements Connection {
     	Record record;
 		try {
 			logger.debug("valuePath {}, timePath {}, timeUnit {}, serialNumber {}", valuePath, timePath, timeUnit, serialNumber);
-			TimeValue timeValuePair = responseHandler.
-					getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+			TimeValue timeValuePair = null;
+			Long last = nullValueMap.get(valuePath);
+			long now = System.currentTimeMillis();
+			if (last != null && now - last < 60000) {
+				timeValuePair = lastTimeValueMap.get(valuePath);
+			}
+			else {
+				timeValuePair = responseHandler.
+						getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+				if (timeValuePair.getValue() == null) {
+					nullValueMap.put(valuePath, now);
+					lastTimeValueMap.put(valuePath, timeValuePair);
+				}
+				else {
+					nullValueMap.remove(valuePath);
+					lastTimeValueMap.remove(valuePath);
+				}
+			}
 	    	record = timeValuePairToRecord(timeValuePair);
 		} catch (ParseException e) {
 			logger.error(e.getMessage());
@@ -147,7 +168,8 @@ public class SolarEdgeConnection implements Connection {
 			record = new Record(Flag.CONNECTION_EXCEPTION);
 			logger.error(e.getMessage());
 			logger.info(SolarEdgeRequestCounter.getCounter());
-			if (e.getCause() instanceof ExecutionException) {
+			if (e.getCause() instanceof ExecutionException || 
+				e.getCause() instanceof RuntimeException) {
 				throw e;
 			}
 		}
