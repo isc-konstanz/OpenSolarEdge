@@ -186,7 +186,7 @@ public class HttpCallable implements Callable<JsonResponse> {
 			sb.append(line);
 		}
 		if (sb.length() != 0 && !sb.toString().isEmpty()) {
-			System.out.println("response: " + sb.toString());
+			logger.debug("response: " + sb.toString());
 			return new JsonResponse(sb.toString());
 		}
 		return null;
