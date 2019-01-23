@@ -21,6 +21,7 @@ package org.openmuc.jsonpath.request.json;
 
 import java.text.ParseException;
 
+import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.TimeConverter;
 import org.openmuc.jsonpath.data.TimeValue;
 
@@ -43,13 +44,13 @@ public class JsonResponse {
 		return response;
 	}
 	
-	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat) throws ParseException {
+	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat) throws ParseException, HttpGeneralException {
 		Object val = getValue(valuePath);
 		Long time = getTimeFromJson(timePath, timeFormat);
 		return getTimeValuePair(val, time);
 	}
 	
-	public TimeValue getTimeValueWithTime(String valuePath, Long time) {
+	public TimeValue getTimeValueWithTime(String valuePath, Long time) throws HttpGeneralException {
 		Object val = getValue(valuePath);
 		Long myTime= System.currentTimeMillis();
 		if (time != null) {
@@ -63,13 +64,14 @@ public class JsonResponse {
 		return new TimeValue(val, time);		
 	}
 	
-	public Object getValue(String path) {
+	public Object getValue(String path) throws HttpGeneralException {
 		Object obj = null;
 		try {
 			obj = jsonContext.read(path);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			RuntimeException re = new RuntimeException(e);
+			throw new HttpGeneralException("Read path " + path + " failed: " + e, re);
 		}
 		return getValue(obj);
 	}
