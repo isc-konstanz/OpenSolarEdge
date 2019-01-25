@@ -13,6 +13,10 @@ import org.openmuc.solaredge.data.TimeWrapper;
 public class SolarEdgeRequestCounter {
 
 	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeRequestCounter.class);
+	
+	private static final String FOLDER = "org.openmuc.solaredge.folder";
+	private static final String FOLDER_DEFAULT = "";
+	private static final String FILE_NAME = "counter.properties";
 
 	private static int COUNTER = 0;
 	private static int DAY = 0;
@@ -32,7 +36,8 @@ public class SolarEdgeRequestCounter {
 	}
 
 	private static void readProperties() {
-		try (FileInputStream in = new FileInputStream("counter.properties")) {
+		String fileName = getFileName();
+		try (FileInputStream in = new FileInputStream(fileName)) {
 			PROPERTIES.load(in);
 			DAY = new Integer(PROPERTIES.getProperty("RequestDay"));
 			COUNTER = new Integer(PROPERTIES.getProperty("Counter"));
@@ -45,8 +50,15 @@ public class SolarEdgeRequestCounter {
 		}
 	}
 
+	private static String getFileName() {
+		String fileName = System.getProperty(FOLDER, FOLDER_DEFAULT);
+		fileName = fileName + FILE_NAME;
+		return fileName;
+	}
+
 	private static void writeProperties() {
-		try (FileOutputStream out = new FileOutputStream("counter.properties")) {
+		String fileName = getFileName();
+		try (FileOutputStream out = new FileOutputStream(fileName)) {
 			PROPERTIES.setProperty("Counter", new Integer(COUNTER).toString());
 			logger.debug("Write DAY: " + PROPERTIES.getProperty("RequestDay") + " COUNTER: " + PROPERTIES.getProperty("Counter"));
 			PROPERTIES.store(out, null);
