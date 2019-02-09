@@ -74,7 +74,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "State"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "State", "tag": "<name>"}
                 }
             ]
         },
@@ -87,7 +87,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>*discharged", "tag": "Energy"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Energy discharged", "tag": "<name>"}
                 }
             ]
         },
@@ -100,7 +100,7 @@
             "processList": [
                 {
                     "process": "log_to_feed",
-                    "arguments": {"type": "ProcessArg::FEEDID", "value": "<node>", "tag": "Power"}
+                    "arguments": {"type": "ProcessArg::FEEDID", "value": "Power", "tag": "<name>"}
                 }
             ]
         }
@@ -108,21 +108,21 @@
 
     "feeds": [
         {
-            "name": "<node>",
-            "tag": "State",
+            "name": "State",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES"
         },
         {
-            "name": "<node>*discharged",
-            "tag": "Energy",
+            "name": "Energy discharged",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "kWh"
         },
         {
-            "name": "<node>",
-            "tag": "Power",
+            "name": "Power",
+            "tag": "<name>",
             "type": "DataType::REALTIME",
             "engine": "Engine::PHPTIMESERIES",
             "unit": "W"
