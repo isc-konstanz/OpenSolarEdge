@@ -24,20 +24,8 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
-import org.openmuc.solaredge.data.TimeWrapper;
-import org.openmuc.solaredge.parameters.SolarEdgeDataParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeEnergyDetailsParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeEnergyParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeParameters;
-import org.openmuc.solaredge.parameters.SolarEdgePowerDetailsParameters;
-import org.openmuc.solaredge.parameters.SolarEdgePowerParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeSiteSonsorsParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeStartEndTimeParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeStorageDataParameters;
-import org.openmuc.solaredge.parameters.SolarEdgeTimeFrameEnergyParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.TimeValue;
@@ -46,6 +34,20 @@ import org.openmuc.jsonpath.request.HttpRequestAction;
 import org.openmuc.jsonpath.request.HttpRequestMethod;
 import org.openmuc.jsonpath.request.HttpRequestParameters;
 import org.openmuc.jsonpath.request.json.JsonResponse;
+import org.openmuc.solaredge.config.SolarEdgeConfig;
+import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.data.TimeWrapper;
+import org.openmuc.solaredge.parameters.DataParameters;
+import org.openmuc.solaredge.parameters.EnergyDataParameters;
+import org.openmuc.solaredge.parameters.EnergyDetailsParameters;
+import org.openmuc.solaredge.parameters.PowerDataParameters;
+import org.openmuc.solaredge.parameters.PowerDetailsParameters;
+import org.openmuc.solaredge.parameters.SiteSensorsParameters;
+import org.openmuc.solaredge.parameters.SolarEdgeParameters;
+import org.openmuc.solaredge.parameters.StorageDataParameters;
+import org.openmuc.solaredge.parameters.TimeFrameEnergyParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * We only support the dots (".") notation for JsonPath and also
@@ -58,41 +60,57 @@ import org.openmuc.jsonpath.request.json.JsonResponse;
  * request. We also do not support bulk requests.
  * 
  */
-public class SolarEdgeResponseHandler {
-	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeResponseHandler.class);
-			
-	private int siteId;
-	private HttpHandler httpHandler;
-	private HttpRequest request;
-	private Map<ResponseMapKey, JsonResponse> responseMap = new HashMap<ResponseMapKey, JsonResponse>();
+public class SolarEdge {
+	private static final Logger logger = LoggerFactory.getLogger(SolarEdge.class);
+
+	protected int siteId;
+	protected TimeZone siteZone;
+	protected HttpHandler handler;
+	protected HttpRequest request;
+
+	protected Map<ResponseMapKey, JsonResponse> responseMap = new HashMap<ResponseMapKey, JsonResponse>();
 	protected Map<ResponseMapKey, TimeWrapper> requestTimeMap = new HashMap<ResponseMapKey, TimeWrapper>();
-//	protected TimeWrapper time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT);
-	protected TimeWrapper lastTime;
-	
-	protected SolarEdgeResponseHandler() {
+
+	protected SolarEdge() {
 	}
-	
-	public SolarEdgeResponseHandler(int siteId, HttpHandler httpHandler) {
+
+	public SolarEdge(int siteId, SolarEdgeConfig config) throws Exception {
 		this.siteId = siteId;
-		this.httpHandler = httpHandler;
+		this.handler = SolarEdgeFactory.getHttpFactory().newAuthenticatedConnection(config);
+		this.handler.start();
+		
+		TimeValue timeValue = getTimeValuePair(SolarEdgeConst.REQUEST_VALUE_PATH_MAP.get("details timeZone"), null, "YEAR", null);
+		siteZone = TimeZone.getTimeZone((String) timeValue.getValue());
 	}
-	
+
+	public void stop() {
+		handler.stop();
+	}
+
+	public HttpHandler getHttpHandler() {
+		return handler;
+	}
+
+	public void setHttpHandler(HttpHandler httpHandler) {
+		this.handler = httpHandler;
+	}
+
 	public int getSiteId() {
 		return siteId;
 	}
 
-	protected void setSiteId(int siteId) {
+	public void setSiteId(int siteId) {
 		this.siteId = siteId;
 	}
 
-	protected HttpHandler getHttpHandler() {
-		return httpHandler;
+	public TimeZone getSiteZone() {
+		return siteZone;
 	}
 
-	protected void setHttpHandler(HttpHandler httpHandler) {
-		this.httpHandler = httpHandler;
+	public void setSiteZone(TimeZone siteZone) {
+		this.siteZone = siteZone;
 	}
-	
+
 	public HttpRequest getRequest() {
 		return request;
 	}
@@ -107,7 +125,7 @@ public class SolarEdgeResponseHandler {
 		JsonResponse response = responseMap.get(responseMapKey);
 		TimeWrapper time = requestTimeMap.get(responseMapKey);
 		if (time == null) {
-			time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT);
+			time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT, siteZone);
 		}
 		if (response == null || 
 			isOlderThanLastTimeUnit(time.getTime(), 
@@ -125,10 +143,10 @@ public class SolarEdgeResponseHandler {
 			try {
 				HttpRequestAction action = new HttpRequestAction("");
 				logger.debug("Request {}, parameters {}", requestPath, parameters);
-				request = httpHandler.getRequest(requestPath, action, 
+				request = handler.getRequest(requestPath, action, 
 						parameters, HttpRequestMethod.GET);
-				SolarEdgeRequestCounter.augmentCounter(System.currentTimeMillis());
-				response = httpHandler.onRequest(request);
+//				SolarEdgeRequestCounter.augmentCounter(System.currentTimeMillis());
+				response = handler.onRequest(request);
 			}
 			catch (Exception ex) {
 				throw ex;
@@ -144,11 +162,10 @@ public class SolarEdgeResponseHandler {
 		return timeValuePair;
 	}
 	
-	private TimeValue getTimeValuePair(JsonResponse response, String valuePath, String timePath, Long time) 
+	protected TimeValue getTimeValuePair(JsonResponse response, String valuePath, String timePath, Long time) 
 			throws ParseException, HttpGeneralException {
 		if (timePath != null) {
-			return response.getTimeValueWithTimePath(valuePath, timePath, 
-					SolarEdgeConst.TIME_FORMAT);
+			return response.getTimeValueWithTimePath(valuePath, timePath, SolarEdgeConst.TIME_FORMAT, siteZone);
 		}
 		else {				
 			return response.getTimeValueWithTime(valuePath, time);
@@ -156,45 +173,39 @@ public class SolarEdgeResponseHandler {
 		
 	}
 	
-	private SolarEdgeParameters getParameters(String requestKey, String timeUnit, TimeWrapper time) throws ParseException {
+	protected SolarEdgeParameters getParameters(String requestKey, String timeUnit, TimeWrapper time) throws ParseException {
 		SolarEdgeParameters params;
 		if (requestKey.equals("energy")) {
-			params = new SolarEdgeEnergyParameters(time, timeUnit);
+			params = new EnergyDataParameters(time, timeUnit);
 		}
 		else if (requestKey.equals("timeFrameEnergy")) {
-			params = new SolarEdgeTimeFrameEnergyParameters(time);
+			params = new TimeFrameEnergyParameters(time);
 		}
 		else if (requestKey.equals("power")) {
-			params = new SolarEdgePowerParameters(time);
+			params = new PowerDataParameters(time);
 		}
 		else if (requestKey.equals("powerDetails")) {
-			params = new SolarEdgePowerDetailsParameters(time);
+			params = new PowerDetailsParameters(time);
 		}
 		else if (requestKey.equals("energyDetails")) {
-			params = new SolarEdgeEnergyDetailsParameters(time, timeUnit);
+			params = new EnergyDetailsParameters(time, timeUnit);
 		}
 		else if (requestKey.equals("storageData")) {
-			params = new SolarEdgeStorageDataParameters(time, timeUnit);
+			params = new StorageDataParameters(time, timeUnit);
 		}
 		else if (requestKey.equals("data")) {
-			params = new SolarEdgeDataParameters(time, timeUnit);
+			params = new DataParameters(time, timeUnit);
 		}
 		else if (requestKey.equals("siteSensors")) {
-			params = new SolarEdgeSiteSonsorsParameters(time, timeUnit);
+			params = new SiteSensorsParameters(time, timeUnit);
 		}
 		else {
 			// used for Sites-, details-, dataPeriod-, overview-, 
 			// siteCurrentPowerFlow-, envBenefits, ChangeLog-, accounts-, 
 			// list-, Inventory-, SiteSensors-, version-, supported-requests 
-			params = new SolarEdgeParameters();
+			params = new SolarEdgeParameters(siteZone);
 		}
 		params.addParameters();
-		if (params instanceof SolarEdgeStartEndTimeParameters) {
-			lastTime = ((SolarEdgeStartEndTimeParameters)params).getLastTime();
-		}
-		else {
-			lastTime = time;
-		}
 		return params;
 	}
 	

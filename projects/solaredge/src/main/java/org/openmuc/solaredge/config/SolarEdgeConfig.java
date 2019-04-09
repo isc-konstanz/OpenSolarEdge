@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.solaredge;
+package org.openmuc.solaredge.config;
 
 import org.openmuc.jsonpath.data.Config;
 

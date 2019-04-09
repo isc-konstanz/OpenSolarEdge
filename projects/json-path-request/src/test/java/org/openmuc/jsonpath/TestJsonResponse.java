@@ -1,6 +1,7 @@
 package org.openmuc.jsonpath;
 
 import java.text.ParseException;
+import java.util.TimeZone;
 
 import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.TimeValue;
@@ -13,10 +14,10 @@ public class TestJsonResponse extends JsonResponse {
 	}
 	
 	public TimeValue getTimeValuePair(String valuePath, String timePath, 
-			Long time, String timeFormat) throws ParseException, HttpGeneralException {
+			Long time, String timeFormat, TimeZone timeZone) throws ParseException, HttpGeneralException {
 		TimeValue retVal;
 		if (timePath != null) {
-			retVal = getTimeValueWithTimePath(valuePath, timePath, timeFormat);
+			retVal = getTimeValueWithTimePath(valuePath, timePath, timeFormat, timeZone);
 		}
 		else {
 			retVal = getTimeValueWithTime(valuePath, time);

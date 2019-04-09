@@ -38,17 +38,14 @@ public class HttpFactory {
 	public static HttpFactory getHttpFactory() {
 		return factory;
 	}
-	
 
 	public HttpHandler newAuthenticatedConnection(Config config) {
-
 		Authentication credentials = getCredentials(config.getAuthorization(), config.getAuthentication());
 		
 		return getConnection(config.getUrl(), credentials, config.getMaxThreads());
 	}
 
 	private HttpHandler getConnection(String address, Authentication credentials, Integer maxThreads) {
-
 		if (address != null) {
 			address = verifyAddress(address);
 		}

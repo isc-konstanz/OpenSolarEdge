@@ -5,14 +5,13 @@ import org.openmuc.jsonpath.TestHttpHandler;
 import org.openmuc.jsonpath.data.Authentication;
 import org.openmuc.jsonpath.data.Config;
 
-public class TestHttpFactory extends SolarEdgeHttpFactory {
-	
+public class TestHttpFactory extends SolarEdgeFactory {
+
 	protected final static TestHttpFactory factory = new TestHttpFactory();
 
 	public static TestHttpFactory getHttpFactory() {
 		return factory;
 	}
-	
 
 	@Override
 	public TestHttpHandler newAuthenticatedConnection(Config config) {

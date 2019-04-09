@@ -22,26 +22,26 @@ package org.openmuc.solaredge.parameters;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 
-import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
-public class SolarEdgeStartEndTimeParameters extends SolarEdgeParameters {
+public class TimeParameters extends SolarEdgeParameters {
 
 	protected TimeWrapper lastTime;
 	protected String timeUnit;
 	protected String start = "startDate";
 	protected String end = "endDate";
 	protected String timeStr;
-			
-	
-	
-	public SolarEdgeStartEndTimeParameters(TimeWrapper lastTime, String timeUnit) {
-		checkTimeUnit(timeUnit);
-		this.lastTime = lastTime;
+
+	public TimeParameters(TimeWrapper time, String timeUnit) throws InvalidParameterException {
+		super(time.getTimeZone());
+		this.lastTime = time;
 		this.timeUnit = timeUnit;
+        
+		checkTimeUnit(timeUnit);
 	}
 
-	protected void checkTimeUnit (String timeUnit) {
+	protected void checkTimeUnit (String timeUnit) throws InvalidParameterException {
 		if (timeUnit.equals("FIVE_MINUTE")) {
 			throw new InvalidParameterException("Time Unit: " + timeUnit + "is not QUARTER_OF_AN_HOUR, HALF_OF_AN_HOUR, HOUR, DAY, WEEK, MONTH, YEAR");			
 		}
@@ -53,7 +53,7 @@ public class SolarEdgeStartEndTimeParameters extends SolarEdgeParameters {
 		
 		TimeWrapper nextLastTime;		
 		if (lastTime == null || (now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit))<lastTime.getTime()) {
-			nextLastTime = new TimeWrapper(now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit), nowTimeFormat);
+			nextLastTime = new TimeWrapper(now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit), format, zone);
 		}
 		else {
 			nextLastTime =  lastTime.clone();

@@ -19,20 +19,24 @@
  */
 package org.openmuc.jsonpath.data;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public final class TimeConverter {
 
-	public static long timeStringToTime(String str, String format) throws ParseException {
-		DateFormat formatter = new SimpleDateFormat(format);
-		return formatter.parse(str).getTime();
+	public static long decode(String str, String format, TimeZone zone) 
+			throws ParseException {
+		SimpleDateFormat date = new SimpleDateFormat(format);
+		date.setTimeZone(zone);
+		
+		return date.parse(str).getTime();
 	}
 
-	public static String longToTimeString(long time, String format) {
-	   SimpleDateFormat sdfDate = new SimpleDateFormat(format);
-	   String strDate = sdfDate.format(time);
-	   return strDate;
+	public static String encode(long time, String format, TimeZone zone) {
+		SimpleDateFormat date = new SimpleDateFormat(format);
+		date.setTimeZone(zone);
+		
+		return date.format(time);
 	}
 }

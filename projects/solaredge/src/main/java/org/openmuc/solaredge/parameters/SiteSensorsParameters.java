@@ -22,12 +22,12 @@ package org.openmuc.solaredge.parameters;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 
-import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
-public class SolarEdgeSiteSonsorsParameters extends SolarEdgeStartEndTimeParameters {
+public class SiteSensorsParameters extends TimeParameters {
 
-	public SolarEdgeSiteSonsorsParameters(TimeWrapper lastTime, String timeUnit) {
+	public SiteSensorsParameters(TimeWrapper lastTime, String timeUnit) {
 		super(lastTime, timeUnit);
 	}
 

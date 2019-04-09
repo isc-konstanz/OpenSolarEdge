@@ -17,30 +17,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.solaredge;
+package org.openmuc.solaredge.parameters;
 
-import org.openmuc.jsonpath.HttpFactory;
-import org.openmuc.jsonpath.data.Authentication;
-import org.openmuc.jsonpath.data.Authorization;
-import org.openmuc.solaredge.data.SolarEdgeApiKeyConst;
+import java.text.ParseException;
 
-public class SolarEdgeHttpFactory extends HttpFactory {
+import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.data.TimeWrapper;
 
-	protected final static SolarEdgeHttpFactory factory = new SolarEdgeHttpFactory();
-	
-	public static SolarEdgeHttpFactory getHttpFactory() {
-		return factory;
+public class EnergyDetailsParameters extends TimeParameters {
+
+	public EnergyDetailsParameters(TimeWrapper lastTime, String timeUnit) {
+		super(lastTime, timeUnit);
+		start = "startTime";
+		end = "endTime";
 	}
-	
+
 	@Override
-	public Authentication getCredentials(String type, String key) {
-		
-		Authentication authentication = null;
-		if (type != null && key != null) {
-			Authorization.setApiKey(SolarEdgeApiKeyConst.getApiKeyConst().getKey());
-			Authorization authorization = Authorization.valueOf(type);
-			authentication = new Authentication(authorization, key);
-		}
-		return authentication;
+	public void addParameters() throws ParseException {
+		super.addParameters();
+		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
+		parameters.addParameter("timeUnit", timeUnit);		
 	}
+
 }

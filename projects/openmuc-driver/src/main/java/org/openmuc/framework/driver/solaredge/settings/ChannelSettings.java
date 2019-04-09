@@ -21,7 +21,7 @@ package org.openmuc.framework.driver.solaredge.settings;
 
 import org.openmuc.framework.config.PreferenceType;
 import org.openmuc.framework.config.Preferences;
-import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 
 public class ChannelSettings extends Preferences {
 

@@ -47,11 +47,9 @@ import org.openmuc.framework.driver.spi.ChannelValueContainer;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.RecordsReceivedListener;
-import org.openmuc.jsonpath.HttpHandler;
 import org.openmuc.jsonpath.data.TimeValue;
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.SolarEdgeRequestCounter;
-import org.openmuc.solaredge.SolarEdgeResponseHandler;
+import org.openmuc.solaredge.SolarEdge;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,10 +58,10 @@ public class SolarEdgeConnection implements Connection {
 	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
 	
     protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
-    
+
     private Map<String, Long> nullValueMap = new HashMap<String, Long>();
     private Map<String, TimeValue> lastTimeValueMap = new HashMap<String, TimeValue>();
-    
+
     /**
      * Interface used by {@link SolarEdgeConnection} to notify the {@link SolarEdgeDriver} about events
      */
@@ -72,33 +70,27 @@ public class SolarEdgeConnection implements Connection {
         public void onDisconnect(int siteId);
     }
 
-    //	private int siteId;
-	protected SolarEdgeResponseHandler responseHandler;
-	protected final int siteId;
-	
     /**
      * The Connections current callback object, which is used to notify of connection events
      */
-    private SolarEdgeConnectionCallbacks callbacks;
+    protected SolarEdgeConnectionCallbacks callbacks;
 
-	public SolarEdgeConnection(int siteId, HttpHandler httpHandler, SolarEdgeConnectionCallbacks callbacks) {
-		this.siteId = siteId;
-		createResponseHandler(httpHandler);
+	protected SolarEdge handler;
+
+	public SolarEdgeConnection(SolarEdge handler, SolarEdgeConnectionCallbacks callbacks) {
+		this.handler = handler;
 	}
-	
-	protected void createResponseHandler(HttpHandler httpHandler) {
-		responseHandler = new SolarEdgeResponseHandler(siteId, httpHandler);
+
+	public SolarEdge getHandler() {
+		return handler;
 	}
-	
-	public SolarEdgeResponseHandler getResponseHandler() {
-		return responseHandler;
-	}
-	
+
 	@Override
 	public void disconnect() {
+		handler.stop();
 		if (callbacks != null) {
-		  callbacks.onDisconnect(siteId);
-          callbacks = null;
+			callbacks.onDisconnect(handler.getSiteId());
+			callbacks = null;
 		}
 	}
 
@@ -116,7 +108,7 @@ public class SolarEdgeConnection implements Connection {
 		
 		return new Record(Flag.UNKNOWN_ERROR);
 	}
-	
+
 	protected Record getRecord(String channelAddress, String channelSettings, String id) throws Exception {
         Record record;
 		try {
@@ -127,7 +119,7 @@ public class SolarEdgeConnection implements Connection {
 	    	String valuePath = settings.getValuePath(channelAddress);
 	    	String serialNumber = settings.getSerialNumber();
 	    	record = getRecord(valuePath, timePath, timeUnit, serialNumber);
-	    	logger.debug("Record: " + new TimeWrapper(record.getTimestamp(), SolarEdgeConst.TIME_FORMAT).getTimeStr() + 
+	    	logger.debug("Record: " + new TimeWrapper(record.getTimestamp(), SolarEdgeConst.TIME_FORMAT, handler.getSiteZone()).getTimeStr() + 
 	    			" Value " + channelAddress + ": " + record.getValue());
 
 		} catch (ArgumentSyntaxException e) {
@@ -148,8 +140,8 @@ public class SolarEdgeConnection implements Connection {
 				timeValuePair = lastTimeValueMap.get(valuePath);
 			}
 			else {
-				timeValuePair = responseHandler.
-						getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+				timeValuePair = handler.getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
+				
 				if (timeValuePair.getValue() == null) {
 					nullValueMap.put(valuePath, now);
 					lastTimeValueMap.put(valuePath, timeValuePair);
@@ -160,14 +152,16 @@ public class SolarEdgeConnection implements Connection {
 				}
 			}
 	    	record = timeValuePairToRecord(timeValuePair);
+	    	
 		} catch (ParseException e) {
 			logger.error(e.getMessage());
-			logger.info(SolarEdgeRequestCounter.getCounter());
+//			logger.info(SolarEdgeRequestCounter.getCounter());
 			record = new Record(Flag.DRIVER_ERROR_CHANNEL_VALUE_TYPE_CONVERSION_EXCEPTION);
+			
 		} catch (Exception e) {
 			record = new Record(Flag.CONNECTION_EXCEPTION);
 			logger.error(e.getMessage());
-			logger.info(SolarEdgeRequestCounter.getCounter());
+//			logger.info(SolarEdgeRequestCounter.getCounter());
 			if (e.getCause() instanceof ExecutionException || 
 				e.getCause() instanceof RuntimeException) {
 				throw e;
@@ -192,11 +186,6 @@ public class SolarEdgeConnection implements Connection {
 	public Object write(List<ChannelValueContainer> arg0, Object arg1)
 			throws UnsupportedOperationException, ConnectionException {
         throw new UnsupportedOperationException();
-	}
-
-	public static String recordToString(Record r) {
-		String timeStr = new TimeWrapper(r.getTimestamp(),SolarEdgeConst.TIME_FORMAT).getTimeStr();
-		return "value: " + r.getValue() + "; time: " + timeStr + "; flag: " + r.getFlag();
 	}
 
 	public static Record timeValuePairToRecord(TimeValue timeValuePair) {

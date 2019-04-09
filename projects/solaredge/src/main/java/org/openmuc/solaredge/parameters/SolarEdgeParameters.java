@@ -20,30 +20,36 @@
 package org.openmuc.solaredge.parameters;
 
 import java.text.ParseException;
+import java.util.TimeZone;
 
 import org.openmuc.jsonpath.request.HttpRequestParameters;
-import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class SolarEdgeParameters {
 
 	protected HttpRequestParameters parameters = new HttpRequestParameters();
+	protected String format = SolarEdgeConst.TIME_FORMAT;
+	protected TimeZone zone;
 	protected TimeWrapper now;
-	protected String nowTimeFormat = SolarEdgeConst.TIME_FORMAT;
+
+	public SolarEdgeParameters(TimeZone zone) {
+		this.zone = zone;
+	}
 
 	public HttpRequestParameters getParameters() throws ParseException {
 		return parameters;
 	}
-	
+
 	public void addParameters() throws ParseException {
-		now = new TimeWrapper(System.currentTimeMillis(), nowTimeFormat);
+		now = new TimeWrapper(System.currentTimeMillis(), format, zone);
 	}
-	
+
 	public TimeWrapper getTimeWrapperNow() {
 		return now;
 	}
-	
-	public void setNowTimeFormat(String timeFormat) {
-		nowTimeFormat = timeFormat;
+
+	public void setFormatTimeFormat(String format) {
+		this.format = format;
 	}
 }

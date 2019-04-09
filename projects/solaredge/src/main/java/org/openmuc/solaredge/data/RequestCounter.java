@@ -1,28 +1,28 @@
-package org.openmuc.solaredge;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.openmuc.solaredge.data;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.TimeZone;
 
-import org.openmuc.solaredge.data.TimeWrapper;
+import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SolarEdgeRequestCounter {
+public class RequestCounter {
 
-	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeRequestCounter.class);
-	
+	private static final Logger logger = LoggerFactory.getLogger(RequestCounter.class);
+
+	private static final String FILE_NAME = "counter.properties";
 	private static final String FOLDER = "org.openmuc.solaredge.folder";
 	private static final String FOLDER_DEFAULT = "";
-	private static final String FILE_NAME = "counter.properties";
 
 	private static int COUNTER = 0;
 	private static int DAY = 0;
-	
+
 	private static Properties PROPERTIES = new Properties();
-	
+
 	public static void augmentCounter(long time) {
 		if (DAY == 0) {
 			readProperties();
@@ -70,7 +70,7 @@ public class SolarEdgeRequestCounter {
 	}
 
 	private static boolean dayChange(long time) {
-		String date = new TimeWrapper(time, SolarEdgeConst.DATE_FORMAT).getTimeStr();
+		String date = new TimeWrapper(time, SolarEdgeConst.DATE_FORMAT, TimeZone.getTimeZone("GMT")).getTimeStr();
 		int myday = new Integer(date.substring(date.length()-2));
 		if (DAY != myday) {
 			DAY = myday;

@@ -20,34 +20,39 @@
 package org.openmuc.solaredge.data;
 
 import java.text.ParseException;
+import java.util.TimeZone;
 
 import org.openmuc.jsonpath.data.TimeConverter;
 
 public class TimeWrapper {
-	
+
+	private TimeZone zone;
+	private String format;
 	private String timeStr;
 	private Long time;
-	private String format;
-	
-	public TimeWrapper(String timeStr, String format) {
-		this.timeStr = timeStr;
+
+	public TimeWrapper(String timeStr, String format, TimeZone zone) {
+		this.zone = zone;
 		this.format = format;
+		this.timeStr = timeStr;
 	}
-	
-	public TimeWrapper(Long time, String format) {
-		this.time = time;
+
+	public TimeWrapper(Long time, String format, TimeZone zone) {
+		this.zone = zone;
 		this.format = format;
+		this.time = time;
 	}
-	
-	public TimeWrapper(String timeStr, Long time, String format) {
+
+	private TimeWrapper(String timeStr, Long time, String format, TimeZone zone) {
+		this.zone = zone;
+		this.format = format;
 		this.timeStr = timeStr;
 		this.time = time;
-		this.format = format;		
 	}
 
 	public String getTimeStr() {
 		if (timeStr == null && time != null) {
-			timeStr = TimeConverter.longToTimeString(time, format);
+			timeStr = TimeConverter.encode(time, format, zone);
 		}
 		return timeStr;
 	}
@@ -59,7 +64,7 @@ public class TimeWrapper {
 
 	public Long getTime() throws ParseException {
 		if (time == null && timeStr != null) {
-			time = TimeConverter.timeStringToTime(timeStr, format);
+			time = TimeConverter.decode(timeStr, format, zone);
 		}
 		return time;
 	}
@@ -76,13 +81,23 @@ public class TimeWrapper {
 	public void setFormat(String format) {
 		this.format = format;
 		if (time != null) {
-			timeStr = TimeConverter.longToTimeString(time, format);
+			timeStr = TimeConverter.encode(time, format, zone);
+		}
+	}
+	
+	public TimeZone getTimeZone() {
+		return zone;
+	}
+
+	public void setTimeZone(TimeZone zone) {
+		this.zone = zone;
+		if (time != null) {
+			timeStr = TimeConverter.encode(time, format, zone);
 		}
 	}
 
 	public TimeWrapper clone() {
-		TimeWrapper retVal = new TimeWrapper(timeStr, time, format);
-		return retVal;
+		return new TimeWrapper(timeStr, time, format, zone);
 	}
-	
+
 }

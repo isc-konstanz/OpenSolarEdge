@@ -5,20 +5,22 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.TimeZone;
 
 import org.junit.Test;
 import org.openmuc.framework.data.Flag;
 import org.openmuc.framework.data.Record;
-import org.openmuc.framework.driver.solaredge.SolarEdgeConnection;
 import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.jsonpath.request.HttpRequest;
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.TestSolarEdgeResponseHandler;
+import org.openmuc.solaredge.TestHandler;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class TestStorageData {
 
 	private final static Charset CHARSET = SolarEdgeConst.CHARSET;
+
+	private final static TimeZone ZONE = TimeZone.getTimeZone("GMT");
 
 	static String jsonString =  "{\r\n" + 
 			"\"storageData\": {\r\n" + 
@@ -129,19 +131,18 @@ public class TestStorageData {
 	static String PARAMETERS = "startTime=&endTime=&serialNumber=";
 	
 	@Test
-    public void test_StorageDataJsonGetPower0() {
-        String testMethodName = "test_StorageDataJsonGetPower0";
+    public void testStorageDataJsonGetPower0() {
+        String testMethodName = "testStorageDataJsonGetPower0";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
-        TestSolarEdgeResponseHandler responseHandler = null;
-        TestSolarEdgeConnection connection = null;
+        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+        TestHandler responseHandler = null;
+        TestConnection connection = null;
         try {
-        	connection = (TestSolarEdgeConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestSolarEdgeResponseHandler)connection.getResponseHandler();
+        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+        	responseHandler = (TestHandler)connection.getHandler();
 		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 			return;
 		}
         
@@ -151,8 +152,7 @@ public class TestStorageData {
 						"$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].timeStamp",
 						"FIVE_MINUTE", "BFA");
 		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 			return;
 		}
  		HttpRequest request = responseHandler.getRequest();
@@ -175,27 +175,24 @@ public class TestStorageData {
 				System.out.println(requestParams);
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 		}
-		System.out.println(SolarEdgeConnection.recordToString(rec));
         assertEquals("12", rec.getValue().asString());
-		assertEquals("2015-10-13 08:00:00", 
-					new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT).getTimeStr());
+		assertEquals("2015-10-13 08:00:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
         assertEquals(Flag.VALID, rec.getFlag());
 	}
 
 	@Test
-    public void test_StorageDataJsonGetBatteryStateLast() {
-        String testMethodName = "test_StorageDataJsonGetBatteryStateLast";
+    public void testStorageDataJsonGetBatteryStateLast() {
+        String testMethodName = "testStorageDataJsonGetBatteryStateLast";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
-        TestSolarEdgeResponseHandler responseHandler = null;
-        TestSolarEdgeConnection connection = null;
+        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+        TestHandler responseHandler = null;
+        TestConnection connection = null;
         try {
-        	connection = (TestSolarEdgeConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestSolarEdgeResponseHandler)connection.getResponseHandler();
+        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+        	responseHandler = (TestHandler)connection.getHandler();
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertTrue(false);
@@ -207,8 +204,7 @@ public class TestStorageData {
 			rec = connection.getRecordForTest("storageData batteryState", 
 						"timeUnit=FIVE_MINUTE;serialNumber=BFA");
 		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 			return;
 		}
  		HttpRequest request = responseHandler.getRequest();
@@ -231,30 +227,26 @@ public class TestStorageData {
 				System.out.println(requestParams);
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 		}
-		System.out.println(SolarEdgeConnection.recordToString(rec));
         assertEquals("3", rec.getValue().asString());
-		assertEquals("2015-10-13 08:40:00", 
-					new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT).getTimeStr());
+		assertEquals("2015-10-13 08:40:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
         assertEquals(Flag.VALID, rec.getFlag());
 	}
 
 	@Test
-    public void test_StorageDataBattery0JsonGetLifeTimeEnergyChargedLast() {
-        String testMethodName = "test_StorageDataBattery0JsonGetLifeTimeEnergyChargedLast";
+    public void testStorageDataBattery0JsonGetLifeTimeEnergyChargedLast() {
+        String testMethodName = "testStorageDataBattery0JsonGetLifeTimeEnergyChargedLast";
         System.out.println(testMethodName);
 
-        TestSolarEdgeDriver driver = new TestSolarEdgeDriver(jsonConnectString, jsonString);
-        TestSolarEdgeResponseHandler responseHandler = null;
-        TestSolarEdgeConnection connection = null;
+        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+        TestHandler responseHandler = null;
+        TestConnection connection = null;
         try {
-        	connection = (TestSolarEdgeConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestSolarEdgeResponseHandler)connection.getResponseHandler();
+        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+        	responseHandler = (TestHandler)connection.getHandler();
 		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 			return;
 		}
         
@@ -287,14 +279,10 @@ public class TestStorageData {
 				System.out.println(requestParams);
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			assertTrue(false);
+			assertTrue(e.getMessage(), false);
 		}
-		System.out.println(SolarEdgeConnection.recordToString(rec));
         assertEquals("6", rec.getValue().asString());
-		assertEquals("2015-10-13 08:40:00", 
-					new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT).getTimeStr());
+		assertEquals("2015-10-13 08:40:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
         assertEquals(Flag.VALID, rec.getFlag());
 	}
-
 }

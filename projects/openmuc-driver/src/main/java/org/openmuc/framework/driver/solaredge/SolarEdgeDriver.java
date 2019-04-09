@@ -31,12 +31,8 @@ import org.openmuc.framework.driver.solaredge.settings.DeviceSettings;
 import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.DriverService;
-import org.openmuc.jsonpath.HttpHandler;
-import org.openmuc.jsonpath.data.TimeValue;
-import org.openmuc.solaredge.SolarEdgeConfig;
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.SolarEdgeHttpFactory;
-import org.openmuc.solaredge.SolarEdgeResponseHandler;
+import org.openmuc.solaredge.SolarEdge;
+import org.openmuc.solaredge.config.SolarEdgeConfig;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,52 +44,36 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 	protected final DriverInfo info = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
 	protected final Map<Integer, SolarEdgeConnection> connectionsMap;
-	protected HttpHandler httpHandler;
-	protected DeviceAddress address;
-	protected DeviceSettings settings;
 
 	public SolarEdgeDriver() {
 		connectionsMap = new HashMap<Integer, SolarEdgeConnection>();
 	}
-	
+
 	@Override
 	public Connection connect(String addressStr, String settingsStr) throws ArgumentSyntaxException, ConnectionException {
-
-		logger.debug("Connect SolarEdge device: \"" + addressStr +  "\" length: " + addressStr.length());
-        address = info.parse(addressStr, DeviceAddress.class);
-		logger.debug("Connect SolarEdge device settings: \"" + settingsStr +  "\" length: " + settingsStr.length());
-        settings = info.parse(settingsStr, DeviceSettings.class);
+		logger.debug("Connect SolarEdge device: \"{}\" for settings: {}", addressStr, settingsStr);
 		
-		SolarEdgeConnection connection = connectionsMap.get(address.getSiteId());
-		
-		if (connection == null) {
-			SolarEdgeConfig config = new SolarEdgeConfig(address.getAddress(), settings.getAuthentication());				
-			httpHandler = getHttpHandler(config);
-
-			connection = createConnection(address);
-			connectionsMap.put(address.getSiteId(), connection);
-			httpHandler.start();
-		}
-		SolarEdgeResponseHandler responseHandler = connection.getResponseHandler();
+		DeviceAddress address = info.parse(addressStr, DeviceAddress.class);
+		DeviceSettings settings = info.parse(settingsStr, DeviceSettings.class);
 		try {
-			TimeValue timeValue = responseHandler.getTimeValuePair(SolarEdgeConst.REQUEST_VALUE_PATH_MAP.get("details name"), null, "YEAR", null);
-			logger.info("Connected to " + timeValue.getValue());
+			return connect(address.getSiteId(), new SolarEdgeConfig(address.getAddress(), settings.getAuthentication()));
+			
+		} catch (Exception e) {
+			throw new ConnectionException("Unable to connect to SolarEdge site: " + e.toString());
 		}
-		catch (Exception e) {
-			throw new ConnectionException("Get Site Details Failed", e);
-		}
+	}
 
+	public SolarEdgeConnection connect(int siteId, SolarEdgeConfig config) throws Exception {
+		SolarEdgeConnection connection = connectionsMap.get(siteId);
+		if (connection == null) {
+			SolarEdge handler = new SolarEdge(siteId, config);
+			
+			connection = new SolarEdgeConnection(handler, this);
+			connectionsMap.put(siteId, connection);
+		}
 		return connection;
 	}
-	
-	protected HttpHandler getHttpHandler(SolarEdgeConfig config) {
-		return SolarEdgeHttpFactory.getHttpFactory().newAuthenticatedConnection(config);
-	}
 
-	protected SolarEdgeConnection createConnection(DeviceAddress address) {
-		return new SolarEdgeConnection(address.getSiteId(), httpHandler, this);
-	}
-	
 	@Override
 	public DriverInfo getInfo() {
 		return info;
@@ -101,7 +81,6 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 
 	@Override
 	public void onDisconnect(int siteId) {
-		httpHandler.stop();
 		connectionsMap.remove(siteId);
 	}
 

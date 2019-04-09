@@ -17,26 +17,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.solaredge.parameters;
+package org.openmuc.solaredge;
 
-import java.text.ParseException;
+import org.openmuc.jsonpath.HttpFactory;
+import org.openmuc.jsonpath.data.Authentication;
+import org.openmuc.jsonpath.data.Authorization;
+import org.openmuc.solaredge.data.ApiKeyConst;
 
-import org.openmuc.solaredge.SolarEdgeConst;
-import org.openmuc.solaredge.data.TimeWrapper;
+public class SolarEdgeFactory extends HttpFactory {
 
-public class SolarEdgeEnergyDetailsParameters extends SolarEdgeStartEndTimeParameters {
-
-	public SolarEdgeEnergyDetailsParameters(TimeWrapper lastTime, String timeUnit) {
-		super(lastTime, timeUnit);
-		start = "startTime";
-		end = "endTime";
+	protected final static SolarEdgeFactory factory = new SolarEdgeFactory();
+	
+	public static SolarEdgeFactory getHttpFactory() {
+		return factory;
 	}
-
+	
 	@Override
-	public void addParameters() throws ParseException {
-		super.addParameters();
-		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
-		parameters.addParameter("timeUnit", timeUnit);		
+	public Authentication getCredentials(String type, String key) {
+		
+		Authentication authentication = null;
+		if (type != null && key != null) {
+			Authorization.setApiKey(ApiKeyConst.getApiKeyConst().getKey());
+			Authorization authorization = Authorization.valueOf(type);
+			authentication = new Authentication(authorization, key);
+		}
+		return authentication;
 	}
-
 }

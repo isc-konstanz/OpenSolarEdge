@@ -17,18 +17,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.solaredge.data;
+package org.openmuc.solaredge.parameters;
 
-public class SolarEdgeApiKeyConst {
+import java.text.ParseException;
 
-	private static SolarEdgeApiKeyConst API_KEY_CONST =
-			new SolarEdgeApiKeyConst();
-	
-	public static SolarEdgeApiKeyConst getApiKeyConst() {
-		return API_KEY_CONST;
+import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.data.TimeWrapper;
+
+public class TimeFrameEnergyParameters extends TimeParameters {
+
+	public TimeFrameEnergyParameters(TimeWrapper lastTime) {
+		super(lastTime, "DAY");
+		lastTime.setFormat(SolarEdgeConst.DATE_FORMAT);
+		setFormatTimeFormat(SolarEdgeConst.DATE_FORMAT);
 	}
 
-	public String getKey() {
-		return "api_key";
+	@Override
+	public void addParameters() throws ParseException {
+		super.addParameters();
+		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
+		parameters.addParameter("timeUnit", timeUnit);		
 	}
 }

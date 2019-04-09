@@ -20,6 +20,7 @@
 package org.openmuc.jsonpath.request.json;
 
 import java.text.ParseException;
+import java.util.TimeZone;
 
 import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.TimeConverter;
@@ -44,9 +45,9 @@ public class JsonResponse {
 		return response;
 	}
 	
-	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat) throws ParseException, HttpGeneralException {
+	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat, TimeZone timeZone) throws ParseException, HttpGeneralException {
+		Long time = getTimeFromJson(timePath, timeFormat, timeZone);
 		Object val = getValue(valuePath);
-		Long time = getTimeFromJson(timePath, timeFormat);
 		return getTimeValuePair(val, time);
 	}
 	
@@ -76,13 +77,13 @@ public class JsonResponse {
 		return getValue(obj);
 	}
 	
-	public Long getTimeFromJson(String path, String timeFormat) throws ParseException {
+	public Long getTimeFromJson(String path, String format, TimeZone zone) throws ParseException {
 		Object obj = jsonContext.read(path);
 		if (obj instanceof JSONArray) {
 			obj = ((JSONArray)obj).get(0).toString();
 		}
 		Long time = null;
-		time = TimeConverter.timeStringToTime(obj.toString(),timeFormat);
+		time = TimeConverter.decode(obj.toString(), format, zone);
 		return time;
 	}
 	

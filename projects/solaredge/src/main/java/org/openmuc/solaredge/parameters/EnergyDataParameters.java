@@ -21,15 +21,15 @@ package org.openmuc.solaredge.parameters;
 
 import java.text.ParseException;
 
-import org.openmuc.solaredge.SolarEdgeConst;
+import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
-public class SolarEdgeTimeFrameEnergyParameters extends SolarEdgeStartEndTimeParameters {
+public class EnergyDataParameters extends TimeParameters {
 
-	public SolarEdgeTimeFrameEnergyParameters(TimeWrapper lastTime) {
-		super(lastTime, "DAY");
+	public EnergyDataParameters(TimeWrapper lastTime, String timeUnit) {
+		super(lastTime, timeUnit);
 		lastTime.setFormat(SolarEdgeConst.DATE_FORMAT);
-		setNowTimeFormat(SolarEdgeConst.DATE_FORMAT);
+		setFormatTimeFormat(SolarEdgeConst.DATE_FORMAT);
 	}
 
 	@Override
@@ -38,4 +38,5 @@ public class SolarEdgeTimeFrameEnergyParameters extends SolarEdgeStartEndTimePar
 		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
 		parameters.addParameter("timeUnit", timeUnit);		
 	}
+
 }
