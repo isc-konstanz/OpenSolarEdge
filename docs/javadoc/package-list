@@ -4,5 +4,6 @@ org.openmuc.jsonpath.data
 org.openmuc.jsonpath.request
 org.openmuc.jsonpath.request.json
 org.openmuc.solaredge
+org.openmuc.solaredge.config
 org.openmuc.solaredge.data
 org.openmuc.solaredge.parameters
