@@ -34,7 +34,7 @@ mv ./libs/device/solaredge /opt/emonmuc/lib/device/
 ~~~
 
 
-# 3 Finish
+## 1.3 Finish
 
 At last, don't forget to remove the released tarball to avoid cluttering of your system.
 
