@@ -13,7 +13,8 @@ To install the OSGi bundle, simply download the latest release tarball and move 
 ~~~shell
 wget --quiet --show-progress https://github.com/isc-konstanz/OpenSolarEdge/releases/download/v1.0.0/OpenSolarEdge-1.0.0.tar.gz
 tar -xzf OpenSolarEdge-1.0.0.tar.gz
-mv ./OpenSolarEdge/libs/openmuc-driver-solaredge-1.0.0.jar /opt/emonmuc/bundles/
+cd OpenSolarEdge*
+mv ./libs/openmuc-driver-solaredge-1.0.0.jar /opt/emonmuc/bundles/
 ~~~
 
 Afterwards restart the framework, for the driver to be started
@@ -29,14 +30,15 @@ Next, device template files are provided by this project, to ease up the configu
 Those can be found at *libs/device/pcharge* and should be moved to the corresponding directory in the emonmuc root:
 
 ~~~shell
-mv ./OpenSolarEdge/libs/device/solaredge /opt/emonmuc/lib/device/
+mv ./libs/device/solaredge /opt/emonmuc/lib/device/
 ~~~
 
 
-## 1.3 Finish
+# 3 Finish
 
 At last, don't forget to remove the released tarball to avoid cluttering of your system.
 
 ~~~
+cd ..
 rm -rf ./OpenSolarEdge*
 ~~~
