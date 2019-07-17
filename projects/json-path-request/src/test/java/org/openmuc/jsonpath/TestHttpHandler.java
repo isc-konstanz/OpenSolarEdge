@@ -1,18 +1,18 @@
 package org.openmuc.jsonpath;
 
-import org.openmuc.jsonpath.data.Authentication;
 import org.openmuc.jsonpath.request.HttpCallable;
 import org.openmuc.jsonpath.request.HttpRequest;
 
-public class TestHttpHandler extends HttpHandler {
+public class TestHttpHandler extends HttpConnection {
 	String response;
 
-	public TestHttpHandler(String address, Authentication authentication, int maxThreads) {
-		super(address, authentication, maxThreads);
+	public TestHttpHandler(String address, String apiKey) {
+		super(address, apiKey, HttpConfig.MAX_THREADS_DEFAULT);
 	}
 
-	public void setResponse(String response) {
+	public TestHttpHandler setResponse(String response) {
 		this.response = response;
+		return this;
 	}
 
 	@Override

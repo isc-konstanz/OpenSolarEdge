@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -49,24 +49,21 @@ import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.RecordsReceivedListener;
 import org.openmuc.jsonpath.data.TimeValue;
 import org.openmuc.solaredge.SolarEdge;
-import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SolarEdgeConnection implements Connection {
 	private static final Logger logger = LoggerFactory.getLogger(SolarEdgeConnection.class);
-	
-    protected final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
 
-    private Map<String, Long> nullValueMap = new HashMap<String, Long>();
-    private Map<String, TimeValue> lastTimeValueMap = new HashMap<String, TimeValue>();
+    private static final DriverPreferences preferences = DriverInfoFactory.getPreferences(SolarEdgeDriver.class);
+
+    private Map<String, TimeValue> timeValues = new HashMap<String, TimeValue>();
 
     /**
      * Interface used by {@link SolarEdgeConnection} to notify the {@link SolarEdgeDriver} about events
      */
     public interface SolarEdgeConnectionCallbacks {
-        
         public void onDisconnect(int siteId);
     }
 
@@ -75,19 +72,16 @@ public class SolarEdgeConnection implements Connection {
      */
     protected SolarEdgeConnectionCallbacks callbacks;
 
-	protected SolarEdge handler;
+	protected final SolarEdge handler;
 
 	public SolarEdgeConnection(SolarEdge handler, SolarEdgeConnectionCallbacks callbacks) {
 		this.handler = handler;
-	}
-
-	public SolarEdge getHandler() {
-		return handler;
+		this.callbacks = callbacks;
 	}
 
 	@Override
 	public void disconnect() {
-		handler.stop();
+		handler.close();
 		if (callbacks != null) {
 			callbacks.onDisconnect(handler.getSiteId());
 			callbacks = null;
@@ -105,8 +99,7 @@ public class SolarEdgeConnection implements Connection {
 		} catch (Exception e) {
             throw new ConnectionException(e.getMessage(), e);
 		}
-		
-		return new Record(Flag.UNKNOWN_ERROR);
+		return null;
 	}
 
 	protected Record getRecord(String channelAddress, String channelSettings, String id) throws Exception {
@@ -114,12 +107,14 @@ public class SolarEdgeConnection implements Connection {
 		try {
 			logger.debug("channelAddress test {}, channelSettings {}, id {}", channelAddress, channelSettings, id);
 			ChannelSettings settings = preferences.get(channelSettings, ChannelSettings.class);
+			
 	    	String timePath = settings.getTimePath(channelAddress);
 	    	String timeUnit = settings.getTimeUnit();
 	    	String valuePath = settings.getValuePath(channelAddress);
 	    	String serialNumber = settings.getSerialNumber();
+	    	
 	    	record = getRecord(valuePath, timePath, timeUnit, serialNumber);
-	    	logger.debug("Record: " + new TimeWrapper(record.getTimestamp(), SolarEdgeConst.TIME_FORMAT, handler.getSiteZone()).getTimeStr() + 
+	    	logger.debug("Record: " + new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, handler.getSiteZone()).getTimeStr() + 
 	    			" Value " + channelAddress + ": " + record.getValue());
 
 		} catch (ArgumentSyntaxException e) {
@@ -128,44 +123,86 @@ public class SolarEdgeConnection implements Connection {
 		}
 		return record;
 	}
-	
+
 	protected Record getRecord(String valuePath, String timePath, String timeUnit, String serialNumber) throws Exception {
-    	Record record;
+    	Record record = null;
 		try {
 			logger.debug("valuePath {}, timePath {}, timeUnit {}, serialNumber {}", valuePath, timePath, timeUnit, serialNumber);
-			TimeValue timeValuePair = null;
-			Long last = nullValueMap.get(valuePath);
-			long now = System.currentTimeMillis();
-			if (last != null && now - last < 60000) {
-				timeValuePair = lastTimeValueMap.get(valuePath);
+			TimeValue timeValue = timeValues.get(valuePath);
+			if (timeValue != null && System.currentTimeMillis() - timeValue.getTime() < 60000) {
+				timeValue = timeValues.get(valuePath);
 			}
 			else {
-				timeValuePair = handler.getTimeValuePair(valuePath, timePath, timeUnit, serialNumber);
-				
-				if (timeValuePair.getValue() == null) {
-					nullValueMap.put(valuePath, now);
-					lastTimeValueMap.put(valuePath, timeValuePair);
-				}
-				else {
-					nullValueMap.remove(valuePath);
-					lastTimeValueMap.remove(valuePath);
-				}
+				timeValue = handler.getTimeValue(valuePath, timePath, timeUnit, serialNumber);
+				timeValues.put(valuePath, timeValue);
 			}
-	    	record = timeValuePairToRecord(timeValuePair);
+			if (timeValue == null) {
+				record = new Record(Flag.DRIVER_ERROR_READ_FAILURE);
+			}
+			else {
+		    	record = getRecord(timeValue);
+			}
 	    	
 		} catch (ParseException e) {
 			logger.error(e.getMessage());
-//			logger.info(SolarEdgeRequestCounter.getCounter());
 			record = new Record(Flag.DRIVER_ERROR_CHANNEL_VALUE_TYPE_CONVERSION_EXCEPTION);
 			
 		} catch (Exception e) {
 			record = new Record(Flag.CONNECTION_EXCEPTION);
 			logger.error(e.getMessage());
-//			logger.info(SolarEdgeRequestCounter.getCounter());
 			if (e.getCause() instanceof ExecutionException || 
 				e.getCause() instanceof RuntimeException) {
 				throw e;
 			}
+		}
+		return record;
+	}
+
+	protected Record getRecord(TimeValue timeValue) {
+		Record record = null;
+		if (timeValue.getValue() instanceof Boolean) {
+			record = new Record(new BooleanValue((Boolean)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof byte[]) {
+			record = new Record(new ByteArrayValue((byte[])timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Byte) {
+			record = new Record(new ByteValue((Byte)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Double) {
+			record = new Record(new DoubleValue((Double)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Float) {
+			record = new Record(new FloatValue((Float)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Integer) {
+			record = new Record(new IntValue((Integer)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Long) {
+			record = new Record(new LongValue((Long)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof Short) {
+			record = new Record(new ShortValue((Short)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() instanceof String) {
+			record = new Record(new StringValue((String)timeValue.getValue()),
+					timeValue.getTime(), Flag.VALID);
+		}
+		else if (timeValue.getValue() == null) {
+			record = new Record(new StringValue(null),
+					timeValue.getTime(), Flag.NO_VALUE_RECEIVED_YET);
+		}
+		else {
+			record = new Record(new StringValue(timeValue.getValue().toString()),
+					timeValue.getTime(), Flag.VALID);
 		}
 		return record;
 	}
@@ -186,55 +223,6 @@ public class SolarEdgeConnection implements Connection {
 	public Object write(List<ChannelValueContainer> arg0, Object arg1)
 			throws UnsupportedOperationException, ConnectionException {
         throw new UnsupportedOperationException();
-	}
-
-	public static Record timeValuePairToRecord(TimeValue timeValuePair) {
-		Record rec = null;
-		if (timeValuePair.getValue() instanceof Boolean) {
-			rec = new Record(new BooleanValue((Boolean)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof byte[]) {
-			rec = new Record(new ByteArrayValue((byte[])timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Byte) {
-			rec = new Record(new ByteValue((Byte)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Double) {
-			rec = new Record(new DoubleValue((Double)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Float) {
-			rec = new Record(new FloatValue((Float)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Integer) {
-			rec = new Record(new IntValue((Integer)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Long) {
-			rec = new Record(new LongValue((Long)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof Short) {
-			rec = new Record(new ShortValue((Short)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() instanceof String) {
-			rec = new Record(new StringValue((String)timeValuePair.getValue()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		else if (timeValuePair.getValue() == null) {
-			rec = new Record(new StringValue(null),
-					timeValuePair.getTime(), Flag.NO_VALUE_RECEIVED_YET);
-		}
-		else {
-			rec = new Record(new StringValue(timeValuePair.getValue().toString()),
-					timeValuePair.getTime(), Flag.VALID);
-		}
-		return rec;
 	}
 
 }

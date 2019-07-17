@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -17,26 +17,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.jsonpath.data;
+package org.openmuc.jsonpath.request;
 
-public enum Authorization {
-
-	DEFAULT,
-	READ,
-	NONE;
-
-	public static String apiKey;
-	
-	public static void setApiKey(String key) {
-		apiKey = key;
-	}
-	
-	public String getValue() {
-		switch (this) {
-		case READ:
-			return apiKey;
-		default:
-			throw new UnsupportedOperationException("No authorization value for type: " + this.name());
-		}
-	}
+public enum HttpMethod {
+	GET, POST, PUT, DELETE;
 }

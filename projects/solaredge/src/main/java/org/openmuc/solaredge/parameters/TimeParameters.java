@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -22,7 +22,7 @@ package org.openmuc.solaredge.parameters;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
 
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class TimeParameters extends SolarEdgeParameters {
@@ -52,8 +52,8 @@ public class TimeParameters extends SolarEdgeParameters {
 		super.addParameters();
 		
 		TimeWrapper nextLastTime;		
-		if (lastTime == null || (now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit))<lastTime.getTime()) {
-			nextLastTime = new TimeWrapper(now.getTime()-SolarEdgeConst.TIME_UNIT_MAP.get(timeUnit), format, zone);
+		if (lastTime == null || (now.getTime()-SolarEdge.TIME_UNITS.get(timeUnit))<lastTime.getTime()) {
+			nextLastTime = new TimeWrapper(now.getTime()-SolarEdge.TIME_UNITS.get(timeUnit), format, zone);
 		}
 		else {
 			nextLastTime =  lastTime.clone();
@@ -76,14 +76,14 @@ public class TimeParameters extends SolarEdgeParameters {
 		if (timeUnit.equals("QUARTER_OF_AN_HOUR") || 
 			timeUnit.equals("HALF_OF_AN_HOUR") ||
 			timeUnit.equals("HOUR")) {
-			if (now.getTime()-time.getTime() > SolarEdgeConst.TIME_UNIT_MAP.get("MONTH")) {
+			if (now.getTime()-time.getTime() > SolarEdge.TIME_UNITS.get("MONTH")) {
 				//TODO test this with month february because a month is defined by 31 days
-				time.setTime(now.getTime() - SolarEdgeConst.TIME_UNIT_MAP.get("MONTH"));
+				time.setTime(now.getTime() - SolarEdge.TIME_UNITS.get("MONTH"));
 			}
 		}
 		else if (timeUnit.equals("DAY")) {
-			if (now.getTime()-time.getTime() > SolarEdgeConst.TIME_UNIT_MAP.get("YEAR")) {
-				time.setTime(now.getTime() - SolarEdgeConst.TIME_UNIT_MAP.get("YEAR"));
+			if (now.getTime()-time.getTime() > SolarEdge.TIME_UNITS.get("YEAR")) {
+				time.setTime(now.getTime() - SolarEdge.TIME_UNITS.get("YEAR"));
 			}
 		}
 		//TODO test this for time unit WEEK, MONTH, YEAR because we do not restrict it to one YEAR.

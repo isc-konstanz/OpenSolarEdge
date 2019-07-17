@@ -6,37 +6,39 @@ import java.text.ParseException;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import org.openmuc.jsonpath.HttpHandler;
+import org.openmuc.jsonpath.TestHttpHandler;
 import org.openmuc.jsonpath.data.TimeValue;
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.jsonpath.request.HttpMethod;
+import org.openmuc.jsonpath.request.HttpParameters;
+import org.openmuc.jsonpath.request.HttpQuery;
+import org.openmuc.jsonpath.request.HttpRequest;
 import org.openmuc.solaredge.data.TimeWrapper;
 import org.openmuc.solaredge.parameters.SolarEdgeParameters;
 import org.openmuc.solaredge.parameters.TimeParameters;
 
 public class TestHandler extends SolarEdge {
 
-	private ResponseMapKey key = null;
+	private HttpQuery query;
+	private HttpParameters params;
+	private HttpResponseKey key;
 	private TimeWrapper time;
 
-	public TestHandler(int siteId, HttpHandler handler) throws Exception {
+	public TestHandler(int siteId, TestHttpHandler handler) throws Exception {
 		this.siteId = siteId;
-		this.handler = handler;
-		this.handler.start();
+		this.handler = handler.open();
 		
-		TimeValue timeValue = getTimeValuePair(SolarEdgeConst.REQUEST_VALUE_PATH_MAP.get("details timeZone"), null, "YEAR", null);
+		TimeValue timeValue = getTimeValue(SolarEdge.REQUEST_PATH_VALUES.get("details timeZone"), null, "YEAR", null);
 		siteZone = TimeZone.getTimeZone((String) timeValue.getValue());
 	}
 
-	@Override
-	protected ResponseMapKey createResponseMapKey(String requestKey, String timeUnit) {
-		key = super.createResponseMapKey(requestKey, timeUnit);
-		return key;
+	public TestHttpHandler getHttpHandler() {
+		return (TestHttpHandler) handler;
 	}
 
 	public TimeWrapper getTimeWrapper() {
-		TimeWrapper time = requestTimeMap.get(key);
+		TimeWrapper time = requestTimes.get(key);
 		if (time == null) {
-			time = new TimeWrapper(System.currentTimeMillis(), SolarEdgeConst.TIME_FORMAT, siteZone);
+			time = new TimeWrapper(System.currentTimeMillis(), SolarEdge.TIME_FORMAT, siteZone);
 		}
 		return time;
 	}
@@ -69,20 +71,33 @@ public class TestHandler extends SolarEdge {
 
 	@Override
 	protected SolarEdgeParameters getParameters(String requestKey, String timeUnit, TimeWrapper time) throws ParseException {
-		SolarEdgeParameters parameters = super.getParameters(requestKey, timeUnit, time);
-		if (parameters instanceof TimeParameters) {
-	        this.time = ((TimeParameters) parameters).getLastTime();
+		SolarEdgeParameters params = super.getParameters(requestKey, timeUnit, time);
+		if (params instanceof TimeParameters) {
+	        this.time = ((TimeParameters) params).getLastTime();
 	    }
 	    else {
 	        this.time = time;
 	    }
-		return parameters;
+		this.params = params.getParameters();
+		this.key = new HttpResponseKey(requestKey, timeUnit);
+		return params;
+	}
+
+	@Override
+	protected HttpQuery getQuery(String key, String serialNumber) {
+		HttpQuery query = super.getQuery(key, serialNumber);
+		this.query = query;
+		return query;
+	}
+
+	public HttpRequest getRequest() {
+		return new HttpRequest(HttpMethod.GET, handler.getAddress(), query, params, handler.getAuthentication());
 	}
 
 	private String addEndTime() {
 		String t = this.getTimeWrapper().getTimeStr();
 		try {
-			t = URLEncoder.encode(t, SolarEdgeConst.CHARSET.name());
+			t = URLEncoder.encode(t, SolarEdge.CHARSET.name());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -92,7 +107,7 @@ public class TestHandler extends SolarEdge {
 	private String addStartTime() {
 		String t = time.getTimeStr();
 		try {
-			t = URLEncoder.encode(t, SolarEdgeConst.CHARSET.name());
+			t = URLEncoder.encode(t, SolarEdge.CHARSET.name());
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

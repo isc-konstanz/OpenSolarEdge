@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -21,7 +21,7 @@ package org.openmuc.solaredge.parameters;
 
 import java.text.ParseException;
 
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class EnergyDetailsParameters extends TimeParameters {
@@ -35,7 +35,7 @@ public class EnergyDetailsParameters extends TimeParameters {
 	@Override
 	public void addParameters() throws ParseException {
 		super.addParameters();
-		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
+		if (timeUnit.equals("HALF_OF_AN_HOUR")) timeUnit = SolarEdge.QUARTER_OF_AN_HOUR;
 		parameters.addParameter("timeUnit", timeUnit);		
 	}
 

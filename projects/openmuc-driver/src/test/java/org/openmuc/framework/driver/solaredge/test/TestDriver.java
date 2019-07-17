@@ -9,8 +9,6 @@ import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.jsonpath.TestHttpHandler;
 import org.openmuc.solaredge.TestHandler;
-import org.openmuc.solaredge.TestHttpFactory;
-import org.openmuc.solaredge.config.SolarEdgeConfig;
 
 public class TestDriver extends SolarEdgeDriver {
 
@@ -31,21 +29,17 @@ public class TestDriver extends SolarEdgeDriver {
 		settings = info.parse(settingsStr, DeviceSettings.class);
 		
 		TestConnection connection = (TestConnection) super.connect(addressStr, settingsStr);
-		((TestHttpHandler) connection.getHandler().getHttpHandler()).setResponse(jsonString);
-		System.out.println("jsonString: " + jsonString);
+		connection.getHandler().getHttpHandler().setResponse(jsonString);
 		return connection;
 	}
 
 	@Override
-	public SolarEdgeConnection connect(int siteId, SolarEdgeConfig config) throws Exception {
+	public SolarEdgeConnection connect(int siteId, String address, String apiKey) throws Exception {
 		TestConnection connection = (TestConnection) connectionsMap.get(siteId);
 		if (connection == null) {
-			TestHttpHandler handler = TestHttpFactory.getHttpFactory().newAuthenticatedConnection(config);
-			handler.setResponse(jsonConnectString);
-			System.out.println("jsonConnectString: " + jsonConnectString);
-			
+			TestHttpHandler handler = new TestHttpHandler(address, apiKey).setResponse(jsonConnectString);
 			connection = new TestConnection(new TestHandler(siteId, handler), this);
-			connectionsMap.put(address.getSiteId(), connection);
+			connectionsMap.put(siteId, connection);
 		}
 		return connection;
 	}

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.openmuc.jsonpath.request.HttpCallable;
 import org.openmuc.jsonpath.request.HttpRequest;
-import org.openmuc.jsonpath.request.json.JsonResponse;
+import org.openmuc.jsonpath.request.HttpResponse;
 
 public class TestHttpCallable extends HttpCallable {
 
@@ -13,21 +13,21 @@ public class TestHttpCallable extends HttpCallable {
 	public TestHttpCallable(HttpRequest request) {
 		super(request);
 	}
-	
+
 	@Override
-	protected JsonResponse get(HttpRequest request) throws IOException {
+	protected HttpResponse get(HttpRequest request) throws IOException {
 		if (response == null) {
 			return null;
 		}
-		return new JsonResponse(response);
+		return new HttpResponse(response);
 	}
-	
+
 	@Override
-	protected JsonResponse post(HttpRequest request) throws IOException {
+	protected HttpResponse post(HttpRequest request) throws IOException {
 		if (response == null) {
 			return null;
 		}
-		return new JsonResponse(response);
+		return new HttpResponse(response);
 	}
 
 	public void setResponse(String response) {

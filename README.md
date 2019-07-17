@@ -7,9 +7,7 @@ This project implements a communication protocol as part of [emonmuc](https://gi
 
 # OpenSolarEdge
 
-The [P-CHARGE systems by SSL Energie](https://www.ssl-energie.de/en/produkte/charging/p-charge/) is a complete series of charging stations for electric vehicles, from the simple charging pillar for electric bicycles, mopeds and electric cars to complete parking area systems for department store chains, communal park houses and parking areas.
-
-This project implements a basic protocol driver and charge control application specifically for the DIN rail *EWS-Box*.
+*This section is a placeholder and will be filled with a project description.*
 
 
 ## 1 Installation

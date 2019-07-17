@@ -10,12 +10,16 @@ public class TestConnection extends SolarEdgeConnection {
 		super(handler, callbacks);
 	}
 
-	public Record getRecordForTest(String channelAddress, String channelSettings) throws Exception {
+	public TestHandler getHandler() {
+		return (TestHandler) handler;
+	}
+
+	public Record getTestRecord(String channelAddress, String channelSettings) throws Exception {
 		return getRecord(channelAddress, channelSettings, "");
 	}
 
-	public Record getRecordForTest(String valuePath, String timePath, String timeUnit, String serialNumber) throws Exception {
+	public Record getTestRecord(String valuePath, String timePath, String timeUnit, String serialNumber) throws Exception {
 		return getRecord(valuePath, timePath, timeUnit, serialNumber);
 	}
-	
+
 }

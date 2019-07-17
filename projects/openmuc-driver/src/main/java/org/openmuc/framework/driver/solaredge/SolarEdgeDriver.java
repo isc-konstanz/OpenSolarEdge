@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -32,7 +32,6 @@ import org.openmuc.framework.driver.spi.Connection;
 import org.openmuc.framework.driver.spi.ConnectionException;
 import org.openmuc.framework.driver.spi.DriverService;
 import org.openmuc.solaredge.SolarEdge;
-import org.openmuc.solaredge.config.SolarEdgeConfig;
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,17 +55,17 @@ public class SolarEdgeDriver implements DriverService, SolarEdgeConnectionCallba
 		DeviceAddress address = info.parse(addressStr, DeviceAddress.class);
 		DeviceSettings settings = info.parse(settingsStr, DeviceSettings.class);
 		try {
-			return connect(address.getSiteId(), new SolarEdgeConfig(address.getAddress(), settings.getAuthentication()));
+			return connect(address.getSiteId(), address.getAddress(), settings.getAuthentication());
 			
 		} catch (Exception e) {
 			throw new ConnectionException("Unable to connect to SolarEdge site: " + e.toString());
 		}
 	}
 
-	public SolarEdgeConnection connect(int siteId, SolarEdgeConfig config) throws Exception {
+	public SolarEdgeConnection connect(int siteId, String address, String apiKey) throws Exception {
 		SolarEdgeConnection connection = connectionsMap.get(siteId);
 		if (connection == null) {
-			SolarEdge handler = new SolarEdge(siteId, config);
+			SolarEdge handler = new SolarEdge(siteId, address, apiKey);
 			
 			connection = new SolarEdgeConnection(handler, this);
 			connectionsMap.put(siteId, connection);

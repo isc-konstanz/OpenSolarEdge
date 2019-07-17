@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -19,53 +19,27 @@
  */
 package org.openmuc.jsonpath.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 public class Authentication {
 
-	private final Authorization authorization;
-	private final String key;
+	private final static String PARAMETER = "api_key";
 
-	public Authentication(Authorization authorization, String key) {
-		this.authorization = authorization;
-		this.key = key;
-	}
+	private final String apiKey;
 
-	public Authorization getAuthorization() {
-		return authorization;
-	}
-	
-	public boolean isDefault() {
-		if (authorization == Authorization.DEFAULT) {
-			return true;
-		}
-		return false;
+	public Authentication(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
-	public String getKey() {
-		return key;
+	public String getApiKey() {
+		return apiKey;
 	}
 
-	@Override
-	public boolean equals(Object object) {
-		if (object instanceof Authentication) {
-			Authentication authentication = (Authentication) object;
-			if (authentication.getAuthorization() == authorization &&
-					authentication.getKey().equals(key)) {
-				return true;
-			}
-		}
-		return false;
+	public String encode(Charset charset) throws UnsupportedEncodingException {
+		return URLEncoder.encode(PARAMETER, charset.name()) + 
+				'=' + URLEncoder.encode(apiKey, charset.name());
 	}
 
-	@Override
-	public String toString() {
-		switch (authorization) {
-		case NONE:
-			return "None";
-		case DEFAULT:
-			return "Default";
-		default:
-			return authorization.getValue() + "=" + key;
-		}
-	}
 }

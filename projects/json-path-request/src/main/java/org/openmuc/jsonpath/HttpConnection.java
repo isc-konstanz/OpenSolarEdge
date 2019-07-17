@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -29,23 +29,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.openmuc.jsonpath.com.HttpGeneralException;
 import org.openmuc.jsonpath.data.Authentication;
 import org.openmuc.jsonpath.request.HttpCallable;
+import org.openmuc.jsonpath.request.HttpMethod;
+import org.openmuc.jsonpath.request.HttpParameters;
+import org.openmuc.jsonpath.request.HttpQuery;
 import org.openmuc.jsonpath.request.HttpRequest;
-import org.openmuc.jsonpath.request.HttpRequestAction;
-import org.openmuc.jsonpath.request.HttpRequestCallbacks;
-import org.openmuc.jsonpath.request.HttpRequestMethod;
-import org.openmuc.jsonpath.request.HttpRequestParameters;
-import org.openmuc.jsonpath.request.json.JsonResponse;
+import org.openmuc.jsonpath.request.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonSyntaxException;
 
-public class HttpHandler implements HttpRequestCallbacks {
+public class HttpConnection {
 
-	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpConnection.class);
 
 	private static final int TIMEOUT = 30000;
 
@@ -55,11 +53,9 @@ public class HttpHandler implements HttpRequestCallbacks {
 	private int maxThreads;
 	private ThreadPoolExecutor executor = null;
 
-
-	public HttpHandler(String address, Authentication authentication, int maxThreads) {
-		
+	protected HttpConnection(String address, String apiKey, int maxThreads) {
 		this.address = address;
-		this.authentication = authentication;
+		this.authentication = new Authentication(apiKey);
 		this.maxThreads = maxThreads;
 	}
 
@@ -71,21 +67,25 @@ public class HttpHandler implements HttpRequestCallbacks {
 		return authentication;
 	}
 
-	public void setAuthentication(Authentication authentication) {
-		this.authentication = authentication;
+	public HttpConnection setAuthentication(String apiKey) {
+		this.authentication = new Authentication(apiKey);
+		return this;
 	}
 
 	public int getMaxThreads() {
 		return maxThreads;
 	}
 
-	public void setMaxThreads(int max) {
+	public HttpConnection setMaxThreads(int max) {
 		this.maxThreads = max;
+		return this;
 	}
 
-	public void start() {
+	public HttpConnection open() {
 		logger.info("Initializing communication \"{}\"", address);
+		
 		initialize();
+		return this;
 	}
 
 	protected void initialize() {
@@ -100,50 +100,36 @@ public class HttpHandler implements HttpRequestCallbacks {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads, namedThreadFactory);
 	}
 
-	public void stop() {
-		logger.info("Shutting emoncms connection \"{}\" down", address);
+	public HttpConnection close() {
+		logger.info("Shutting connection \"{}\" down", address);
 		
 		if (executor != null) {
 			executor.shutdown();
 		}
+		return this;
 	}
 
-	@Override
-	public HttpRequest getRequest(String parent, HttpRequestAction action, HttpRequestParameters parameters,
-			HttpRequestMethod method) {
-		return getRequest(parent, authentication, action, parameters, method);
+	public HttpResponse get(HttpQuery uri, HttpParameters parameters) throws HttpException {
+		return request(HttpMethod.GET, uri, parameters);
 	}
-	
-	@Override
-	public HttpRequest getRequest(String parent, Authentication authentication, HttpRequestAction action,
-			HttpRequestParameters parameters, HttpRequestMethod method) {
-		String url = address + parent;
-		if (!url.endsWith("/"))
-			url += "/";
-		
-		return new HttpRequest(url, authentication, action, parameters, method);
+
+	public HttpResponse post(HttpQuery uri, HttpParameters parameters) throws HttpException {
+		return request(HttpMethod.POST, uri, parameters);
 	}
-	
-	@Override
-	public JsonResponse onRequest(HttpRequest request) throws HttpGeneralException {
-		try {
-			JsonResponse response = submitRequest(request);
-			if (response != null) {
-				// TODO is that needed, ask Adrian ?
-//				if (response.isSuccess()) {
-					return response;
-//				}
-//				throw new HttpException("Request responsed \"false\"");
-			}
-			throw new HttpGeneralException("Request failed");
-		}
-		catch (Exception e) {
-			logger.debug(e.getMessage());
-			throw e;
-		}
+
+	public HttpResponse put(HttpQuery uri, HttpParameters parameters) throws HttpException {
+		return request(HttpMethod.PUT, uri, parameters);
 	}
-	
-	protected synchronized JsonResponse submitRequest(HttpRequest request) throws HttpGeneralException {
+
+	public HttpResponse delete(HttpQuery uri, HttpParameters parameters) throws HttpException {
+		return request(HttpMethod.DELETE, uri, parameters);
+	}
+
+	protected HttpResponse request(HttpMethod method, HttpQuery uri, HttpParameters parameters) throws HttpException {
+		return request(new HttpRequest(method, address, uri, parameters, authentication));
+	}
+
+	protected synchronized HttpResponse request(HttpRequest request) throws HttpException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Requesting \"{}\"", request.toString());
 		}
@@ -151,32 +137,28 @@ public class HttpHandler implements HttpRequestCallbacks {
 		
 		try {
 			HttpCallable task = createCallable(request);
-			final Future<JsonResponse> submit = executor.submit(task);
+			final Future<HttpResponse> submit = executor.submit(task);
 			try {
-				JsonResponse response = submit.get(TIMEOUT, TimeUnit.MILLISECONDS);
+				HttpResponse response = submit.get(TIMEOUT, TimeUnit.MILLISECONDS);
 				
 				if (logger.isTraceEnabled()) {
-					String rsp = "Returned null";
-					if (response != null) {
-						rsp = response.getResponse();
-					}
-					logger.trace("Received response after {}ms: {}", System.currentTimeMillis() - start, rsp);
+					logger.trace("Received response after {}ms: {}", System.currentTimeMillis() - start, response);
 				}
 				return response;
 			}
 			catch (JsonSyntaxException e) {
-				throw new HttpGeneralException("Received invalid JSON response: " + e, e);
+				throw new HttpException("Received invalid JSON response: " + e, e);
 			}
 			catch (CancellationException | TimeoutException e) {
 				submit.cancel(true);
-				throw new HttpGeneralException("Aborted request \"" + request.toString() + "\": " + e, e);
+				throw new HttpException("Aborted request \"" + request.toString() + "\": " + e, e);
 			}
 		} catch (InterruptedException | ExecutionException e) {
 			initialize();
-			throw new HttpGeneralException("Communication failed: " + e, e);
+			throw new HttpException("Communication failed: " + e, e);
 		}
 	}
-	
+
 	protected HttpCallable createCallable(HttpRequest request) {
 		return new HttpCallable(request);
 	}

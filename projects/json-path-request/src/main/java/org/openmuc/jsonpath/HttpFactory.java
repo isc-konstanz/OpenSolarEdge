@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -22,41 +22,35 @@ package org.openmuc.jsonpath;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openmuc.jsonpath.data.ApiKeyConst;
-import org.openmuc.jsonpath.data.Authentication;
-import org.openmuc.jsonpath.data.Authorization;
-import org.openmuc.jsonpath.data.Config;
-
-
-
 public class HttpFactory {
 
-	protected final List<HttpHandler> httpSingletonList = new ArrayList<HttpHandler>();
+	protected final List<HttpConnection> httpSingletonList = new ArrayList<HttpConnection>();
 
 	protected final static HttpFactory factory = new HttpFactory();
-	
+
 	public static HttpFactory getHttpFactory() {
 		return factory;
 	}
 
-	public HttpHandler newAuthenticatedConnection(Config config) {
-		Authentication credentials = getCredentials(config.getAuthorization(), config.getAuthentication());
-		
-		return getConnection(config.getUrl(), credentials, config.getMaxThreads());
+	public HttpConnection newConnection(HttpConfig config) {
+		return newConnection(config.getAddress(), config.getApiKey(), config.getMaxThreads());
 	}
 
-	private HttpHandler getConnection(String address, Authentication credentials, Integer maxThreads) {
+	public HttpConnection newConnection(String address, String apiKey) {
+		return newConnection(address, apiKey, null);
+	}
+
+	public HttpConnection newConnection(String address, String apiKey, Integer maxThreads) {
 		if (address != null) {
 			address = verifyAddress(address);
 		}
 		else {
 			return null;
 		}
-
-		for (HttpHandler handler : httpSingletonList) {
+		for (HttpConnection handler : httpSingletonList) {
 			if (handler.getAddress().equals(address)) {
-				if (!handler.getAuthentication().equals(credentials)) {
-					handler.setAuthentication(credentials);
+				if (!handler.getAuthentication().getApiKey().equals(apiKey)) {
+					handler.setAuthentication(apiKey);
 				}
 				if (maxThreads != null && handler.getMaxThreads() != maxThreads) {
 					handler.setMaxThreads(maxThreads);
@@ -65,23 +59,12 @@ public class HttpFactory {
 			}
 		}
 		if (maxThreads == null) {
-			maxThreads = Config.MAX_THREADS_DEFAULT;
+			maxThreads = HttpConfig.MAX_THREADS_DEFAULT;
 		}
-		HttpHandler handler = new HttpHandler(address, credentials, maxThreads);
+		HttpConnection handler = new HttpConnection(address, apiKey, maxThreads);
 		httpSingletonList.add(handler);
-
-		return handler;
-	}
-
-	public Authentication getCredentials(String type, String key) {
 		
-		Authentication authentication = null;
-		if (type != null && key != null) {
-			Authorization.setApiKey(ApiKeyConst.getApiKeyConst().getKey());
-			Authorization authorization = Authorization.valueOf(type);
-			authentication = new Authentication(authorization, key);
-		}
-		return authentication;
+		return handler;
 	}
 
 	public static String verifyAddress(String address) {

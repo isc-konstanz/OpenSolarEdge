@@ -12,13 +12,13 @@ import org.openmuc.framework.data.Flag;
 import org.openmuc.framework.data.Record;
 import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.jsonpath.request.HttpRequest;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.TestHandler;
-import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class TestStorageData {
 
-	private final static Charset CHARSET = SolarEdgeConst.CHARSET;
+	private final static Charset CHARSET = SolarEdge.CHARSET;
 
 	private final static TimeZone ZONE = TimeZone.getTimeZone("GMT");
 
@@ -123,166 +123,147 @@ public class TestStorageData {
 			"}\r\n" + 
 			"}\r\n" + 
 			"}";
-	
-	static final String ADDRESS = "https://monitoringapi.solaredge.com;249379";
-    static final String SETTINGS = "authentication=L4QLVQ1LOKCQX2193VSEICXW61NP6B1O";
 
-	static String API = "storageData/?startTime=&endTime=&api_key=";
+	static final String ADDRESS = "https://monitoringapi.solaredge.com/;249379";
+	static final String SETTINGS = "authentication=L4QLVQ1LOKCQX2193VSEICXW61NP6B1O";
+
+	static String API = "storageData?startTime=&endTime=&api_key=";
 	static String PARAMETERS = "startTime=&endTime=&serialNumber=";
-	
-	@Test
-    public void testStorageDataJsonGetPower0() {
-        String testMethodName = "testStorageDataJsonGetPower0";
-        System.out.println(testMethodName);
 
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
+	@Test
+	public void testStorageDataJsonGetPower0() {
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-        
-        Record rec;
+		
+		Record record;
 		try {
-			rec = connection.getRecordForTest("$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].power", 
+			record = connection.getTestRecord("$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].power", 
 						"$.storageData.batteries[?(@.serialNumber=='@serialNumber')].telemetries[0].timeStamp",
 						"FIVE_MINUTE", "BFA");
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
- 		HttpRequest request = responseHandler.getRequest();
+		
+		TestHandler handler = connection.getHandler();
+ 		HttpRequest request = handler.getRequest();
 		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, null, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = handler.fillRequest(requestResult, null, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, null);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = handler.fillParameters(PARAMETERS, null);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals("12", rec.getValue().asString());
-		assertEquals("2015-10-13 08:00:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.VALID, rec.getFlag());
+		assertEquals("2015-10-13 08:00:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals("12", record.getValue().asString());
+		assertEquals(Flag.VALID, record.getFlag());
 	}
 
 	@Test
-    public void testStorageDataJsonGetBatteryStateLast() {
-        String testMethodName = "testStorageDataJsonGetBatteryStateLast";
-        System.out.println(testMethodName);
-
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
+	public void testStorageDataJsonGetBatteryStateLast() {
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertTrue(false);
 			return;
 		}
-        
-        Record rec;
+		
+		Record record;
 		try {
-			rec = connection.getRecordForTest("storageData batteryState", 
+			record = connection.getTestRecord("storageData batteryState", 
 						"timeUnit=FIVE_MINUTE;serialNumber=BFA");
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
- 		HttpRequest request = responseHandler.getRequest();
+		
+		TestHandler handler = connection.getHandler();
+ 		HttpRequest request = handler.getRequest();
 		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, null, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = handler.fillRequest(requestResult, null, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, null);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = handler.fillParameters(PARAMETERS, null);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals("3", rec.getValue().asString());
-		assertEquals("2015-10-13 08:40:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.VALID, rec.getFlag());
+		assertEquals("2015-10-13 08:40:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals("3", record.getValue().asString());
+		assertEquals(Flag.VALID, record.getFlag());
 	}
 
 	@Test
-    public void testStorageDataBattery0JsonGetLifeTimeEnergyChargedLast() {
-        String testMethodName = "testStorageDataBattery0JsonGetLifeTimeEnergyChargedLast";
-        System.out.println(testMethodName);
-
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
+	public void testStorageDataBattery0JsonGetLifeTimeEnergyChargedLast() {
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-        
-        Record rec;
+		
+		Record record;
 		try {
-			rec = connection.getRecordForTest("storageData lifeTimeEnergyDischarged", 
+			record = connection.getTestRecord("storageData lifeTimeEnergyDischarged", 
 						"timeUnit=FIVE_MINUTE");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			assertTrue(false);
 			return;
 		}
- 		HttpRequest request = responseHandler.getRequest();
+
+		TestHandler handler = connection.getHandler();
+ 		HttpRequest request = handler.getRequest();
 		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, null, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = handler.fillRequest(requestResult, null, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, null);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = handler.fillParameters(PARAMETERS, null);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals("6", rec.getValue().asString());
-		assertEquals("2015-10-13 08:40:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.VALID, rec.getFlag());
+		assertEquals("2015-10-13 08:40:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals("6", record.getValue().asString());
+		assertEquals(Flag.VALID, record.getFlag());
 	}
 }

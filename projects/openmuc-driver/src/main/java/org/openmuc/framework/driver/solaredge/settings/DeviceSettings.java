@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -27,7 +27,7 @@ public class DeviceSettings extends Preferences {
     public static final PreferenceType TYPE = PreferenceType.SETTINGS_DEVICE;
 
     @Option
-    private String authentication ;
+    private String authentication;
 
     @Override
     public PreferenceType getPreferenceType() {
@@ -37,4 +37,5 @@ public class DeviceSettings extends Preferences {
     public String getAuthentication() {
     	return authentication;
     }
+
 }

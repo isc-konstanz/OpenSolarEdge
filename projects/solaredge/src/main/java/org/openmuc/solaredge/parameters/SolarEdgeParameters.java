@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -22,14 +22,14 @@ package org.openmuc.solaredge.parameters;
 import java.text.ParseException;
 import java.util.TimeZone;
 
-import org.openmuc.jsonpath.request.HttpRequestParameters;
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.jsonpath.request.HttpParameters;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class SolarEdgeParameters {
 
-	protected HttpRequestParameters parameters = new HttpRequestParameters();
-	protected String format = SolarEdgeConst.TIME_FORMAT;
+	protected HttpParameters parameters = new HttpParameters();
+	protected String format = SolarEdge.TIME_FORMAT;
 	protected TimeZone zone;
 	protected TimeWrapper now;
 
@@ -37,7 +37,7 @@ public class SolarEdgeParameters {
 		this.zone = zone;
 	}
 
-	public HttpRequestParameters getParameters() throws ParseException {
+	public HttpParameters getParameters() throws ParseException {
 		return parameters;
 	}
 

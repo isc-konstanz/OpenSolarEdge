@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -21,13 +21,13 @@ package org.openmuc.solaredge.parameters;
 
 import java.text.ParseException;
 
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class PowerDetailsParameters extends TimeParameters {
 
 	public PowerDetailsParameters(TimeWrapper lastTime) {
-		super(lastTime, SolarEdgeConst.QUARTER_OF_AN_HOUR);
+		super(lastTime, SolarEdge.QUARTER_OF_AN_HOUR);
 		start = "startTime";
 		end = "endTime";
 	}
@@ -38,9 +38,9 @@ public class PowerDetailsParameters extends TimeParameters {
 		// period between endTime and startTime should not exceed one month. If 
 		// the period is longer, the system will generate error 403 with proper 
 		// description. 
-		if (now.getTime()-time.getTime() > SolarEdgeConst.TIME_UNIT_MAP.get("MONTH")) {
+		if (now.getTime()-time.getTime() > SolarEdge.TIME_UNITS.get("MONTH")) {
 			//TODO test this with month february because a month is defined by 31 days
-			time.setTime(now.getTime() - SolarEdgeConst.TIME_UNIT_MAP.get("MONTH"));
+			time.setTime(now.getTime() - SolarEdge.TIME_UNITS.get("MONTH"));
 		}
 	}
 }

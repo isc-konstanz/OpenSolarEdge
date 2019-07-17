@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -28,6 +28,16 @@ public class HttpException extends IOException {
 	private String message = "Unknown HTTP error";
 
 	public HttpException() {
+		super();
+	}
+
+	public HttpException(Throwable cause) {
+		super(cause);
+	}
+
+	public HttpException(String message, Throwable cause) {
+		super(message, cause);
+		this.message = message;
 	}
 
 	public HttpException(String message) {

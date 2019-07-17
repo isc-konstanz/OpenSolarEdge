@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -31,18 +31,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 
 import org.openmuc.jsonpath.HttpException;
-import org.openmuc.jsonpath.request.json.JsonResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
-public class HttpCallable implements Callable<JsonResponse> {
-	
-	private static final Logger logger = LoggerFactory.getLogger(HttpCallable.class);
-	
+public class HttpCallable implements Callable<HttpResponse> {
+
 	private final static Charset CHARSET = StandardCharsets.UTF_8;
-//	private final static int CONNECTION_TIMEOUT = 5000;
-//	private final static int READ_TIMEOUT = 10000;
 
 	private final HttpRequest request;
 	private HttpURLConnection connection = null;
@@ -55,10 +48,10 @@ public class HttpCallable implements Callable<JsonResponse> {
 	public HttpRequest getRequest() {
 		return request;
 	}
-	
+
 	@Override
-	public JsonResponse call() throws Exception {
-		HttpRequestMethod method = request.getMethod();
+	public HttpResponse call() throws Exception {
+		HttpMethod method = request.getMethod();
 		switch (method) {
 		case GET:
 			return get(request);
@@ -69,27 +62,23 @@ public class HttpCallable implements Callable<JsonResponse> {
 		}
 	}
 
-	protected JsonResponse get(HttpRequest request) throws IOException {
+	protected HttpResponse get(HttpRequest request) throws IOException {
 		try {
-			URL url = new URL(request.getRequest(CHARSET));
-			logger.debug(url.toString());
-			HttpURLConnection.setFollowRedirects(true);
-			connection = (HttpURLConnection)url.openConnection();
+			URL url = new URL(request.parse(CHARSET));
+			connection = (HttpURLConnection) url.openConnection();
 			
-			connection.setRequestMethod(request.getMethod().name());
+			connection.setRequestMethod(HttpMethod.GET.name());
 			connection.setRequestProperty("Charset", CHARSET.name());
 			connection.setRequestProperty("Accept-Charset", CHARSET.name());
 			connection.setRequestProperty("Connection", "Close");
 			connection.setRequestProperty("Content-Type", "application/json;charset="+CHARSET.name());
 			connection.setRequestProperty("Content-length", "0");
 			
-			connection.setInstanceFollowRedirects(true);
+			connection.setInstanceFollowRedirects(false);
 			connection.setAllowUserInteraction(false);
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
-//			connection.setConnectTimeout(CONNECTION_TIMEOUT);
-//			connection.setReadTimeout(READ_TIMEOUT);
 			connection.connect();
 			
 			if (verifyResponse(connection.getResponseCode())) {
@@ -99,8 +88,7 @@ public class HttpCallable implements Callable<JsonResponse> {
 			}
 			throw new HttpException("HTTP status code " + connection.getResponseCode() + ": " + connection.getResponseMessage());
 		
-		}
-		finally {
+		} finally {
 			try {
 				if (stream != null) {
 					stream.close();
@@ -115,17 +103,17 @@ public class HttpCallable implements Callable<JsonResponse> {
 		  	}
 		}
 	}
-	
-	protected JsonResponse post(HttpRequest request) throws IOException {
+
+	protected HttpResponse post(HttpRequest request) throws IOException {
 		try {
-			URL url = new URL(request.getRequest(CHARSET));
+			URL url = new URL(request.parse(CHARSET));
 			
 			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod(HttpRequestMethod.POST.name());
+			connection.setRequestMethod(HttpMethod.POST.name());
 			connection.setRequestProperty("Connection", "Close");
 			connection.setRequestProperty("Charset", CHARSET.name());
 			connection.setRequestProperty("Accept-Charset", CHARSET.name());
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset="+CHARSET.name());
+			connection.setRequestProperty("Content-Type", "application/json;charset="+CHARSET.name());
 			
 			byte[] content = null;
 			if (request.getParameters() != null) {
@@ -141,9 +129,7 @@ public class HttpCallable implements Callable<JsonResponse> {
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);
 			connection.setDoInput(true);
-//			connection.setConnectTimeout(CONNECTION_TIMEOUT);
-//			connection.setReadTimeout(READ_TIMEOUT);
-	
+			
 			if (content != null) {
 				DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
 				wr.write(content);
@@ -174,8 +160,8 @@ public class HttpCallable implements Callable<JsonResponse> {
 		  	}
 		}
 	}
-	
-	private JsonResponse read() throws IOException {
+
+	private HttpResponse read() throws IOException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(stream, CHARSET.name()));
 		
 		StringBuilder sb = new StringBuilder();
@@ -186,12 +172,11 @@ public class HttpCallable implements Callable<JsonResponse> {
 			sb.append(line);
 		}
 		if (sb.length() != 0 && !sb.toString().isEmpty()) {
-			logger.debug("response: " + sb.toString());
-			return new JsonResponse(sb.toString());
+			return new HttpResponse(sb.toString());
 		}
 		return null;
 	}
-	
+
 	private boolean verifyResponse(int httpStatus) throws HttpException {
 		switch (httpStatus) {
 		case HttpURLConnection.HTTP_OK:
@@ -200,4 +185,5 @@ public class HttpCallable implements Callable<JsonResponse> {
 			return false;
 		}
 	}
+
 }

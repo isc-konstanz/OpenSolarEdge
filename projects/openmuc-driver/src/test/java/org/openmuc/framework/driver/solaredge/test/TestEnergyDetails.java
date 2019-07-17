@@ -13,67 +13,67 @@ import org.openmuc.framework.data.Flag;
 import org.openmuc.framework.data.Record;
 import org.openmuc.framework.driver.solaredge.settings.DeviceAddress;
 import org.openmuc.jsonpath.request.HttpRequest;
+import org.openmuc.solaredge.SolarEdge;
 import org.openmuc.solaredge.TestHandler;
-import org.openmuc.solaredge.config.SolarEdgeConst;
 import org.openmuc.solaredge.data.TimeWrapper;
 
 public class TestEnergyDetails {
 
-	private final static Charset CHARSET = SolarEdgeConst.CHARSET;
+	private final static Charset CHARSET = SolarEdge.CHARSET;
 
 	private final static TimeZone ZONE = TimeZone.getTimeZone("GMT");
 
 	static String jsonString =  "{\r\n" + 
-    		"\"energyDetails\": {\r\n" + 
-    		"\"timeUnit\": \"WEEK\",\r\n" + 
-    		"\"unit\": \"Wh\",\r\n" + 
-    		"\"meters\": [\r\n" + 
-    		"{\r\n" + 
-    		"\"type\": \"Production\",\r\n" + 
-    		"\"values\": [\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-10-19 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-10-26 00:00:00\",\r\n" + 
-    		"\"value\": null\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-02 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-09 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-16 00:00:00\",\r\n" + 
-    		"\"value\": 2953\r\n" + 
-    		"}\r\n" + 
-    		"]\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"type\": \"Consumption\",\r\n" + 
-    		"\"values\": [\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-10-19 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-10-26 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-02 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-09 00:00:00\"\r\n" + 
-    		"},\r\n" + 
-    		"{\r\n" + 
-    		"\"date\": \"2015-11-16 00:00:00\",\r\n" + 
-    		"\"value\": 29885\r\n" + 
-    		"}\r\n" + 
-    		"]\r\n" + 
-    		"}\r\n" + 
-    		"]\r\n" + 
-    		"}\r\n" + 
-    		"}";
+			"\"energyDetails\": {\r\n" + 
+			"\"timeUnit\": \"WEEK\",\r\n" + 
+			"\"unit\": \"Wh\",\r\n" + 
+			"\"meters\": [\r\n" + 
+			"{\r\n" + 
+			"\"type\": \"Production\",\r\n" + 
+			"\"values\": [\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-10-19 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-10-26 00:00:00\",\r\n" + 
+			"\"value\": null\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-02 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-09 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-16 00:00:00\",\r\n" + 
+			"\"value\": 2953\r\n" + 
+			"}\r\n" + 
+			"]\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"type\": \"Consumption\",\r\n" + 
+			"\"values\": [\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-10-19 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-10-26 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-02 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-09 00:00:00\"\r\n" + 
+			"},\r\n" + 
+			"{\r\n" + 
+			"\"date\": \"2015-11-16 00:00:00\",\r\n" + 
+			"\"value\": 29885\r\n" + 
+			"}\r\n" + 
+			"]\r\n" + 
+			"}\r\n" + 
+			"]\r\n" + 
+			"}\r\n" + 
+			"}";
 	
 	static String jsonConnectString =  "{\r\n" + 
 			"\"details\":{\r\n" + 
@@ -107,220 +107,198 @@ public class TestEnergyDetails {
 			"}\r\n" + 
 			"}\r\n" + 
 			"}";
-	
-	static final String ADDRESS = "https://monitoringapi.solaredge.com;249379";
-    static final String SETTINGS = "authentication=L4QLVQ1LOKCQX2193VSEICXW61NP6B1O";
 
-	static String API = "energyDetails/?startTime=&endTime=&timeUnit=&api_key=";
+	static final String ADDRESS = "https://monitoringapi.solaredge.com/;249379";
+	static final String SETTINGS = "authentication=L4QLVQ1LOKCQX2193VSEICXW61NP6B1O";
+
+	static String API = "energyDetails?startTime=&endTime=&timeUnit=&api_key=";
 	static String PARAMETERS = "startTime=&endTime=&timeUnit=";
-	
-	@Test
-    public void testEnergyDetailsJsonGetEnergyDetails() {
-        String testMethodName = "testEnergyDetailsJsonGetEnergyDetails";
-        System.out.println(testMethodName);
 
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
+	@Test
+	public void testEnergyDetailsJsonGetEnergyDetails() {
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-        
-        Record rec;
+		
+		Record record;
 		try {
-			rec = connection.getRecordForTest("$.energyDetails", null, 
-						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+			record = connection.getTestRecord("$.energyDetails", null, 
+					SolarEdge.QUARTER_OF_AN_HOUR, null);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-		HttpRequest request = responseHandler.getRequest();
+		
+		TestHandler handler = connection.getHandler();
+		HttpRequest request = handler.getRequest();
 		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
-			responseHandler.getSiteId();
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, SolarEdgeConst.QUARTER_OF_AN_HOUR, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = handler.fillRequest(requestResult, SolarEdge.QUARTER_OF_AN_HOUR, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, SolarEdgeConst.QUARTER_OF_AN_HOUR);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = handler.fillParameters(PARAMETERS, SolarEdge.QUARTER_OF_AN_HOUR);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals("{timeUnit=WEEK, unit=Wh, meters=[{\"type\":\"Production\",\"values\":[{\"date\":\"2015-10-19 00:00:00\"},{\"date\":\"2015-10-26 00:00:00\",\"value\":null},{\"date\":\"2015-11-02 00:00:00\"},{\"date\":\"2015-11-09 00:00:00\"},{\"date\":\"2015-11-16 00:00:00\",\"value\":2953}]},{\"type\":\"Consumption\",\"values\":[{\"date\":\"2015-10-19 00:00:00\"},{\"date\":\"2015-10-26 00:00:00\"},{\"date\":\"2015-11-02 00:00:00\"},{\"date\":\"2015-11-09 00:00:00\"},{\"date\":\"2015-11-16 00:00:00\",\"value\":29885}]}]}", rec.getValue().asString());
-        try {
-			assertEquals(responseHandler.getTimeWrapper().getTime(), rec.getTimestamp());
+		
+		assertEquals("{timeUnit=WEEK, unit=Wh, meters=[{\"type\":\"Production\",\"values\":[{\"date\":\"2015-10-19 00:00:00\"},{\"date\":\"2015-10-26 00:00:00\",\"value\":null},{\"date\":\"2015-11-02 00:00:00\"},{\"date\":\"2015-11-09 00:00:00\"},{\"date\":\"2015-11-16 00:00:00\",\"value\":2953}]},{\"type\":\"Consumption\",\"values\":[{\"date\":\"2015-10-19 00:00:00\"},{\"date\":\"2015-10-26 00:00:00\"},{\"date\":\"2015-11-02 00:00:00\"},{\"date\":\"2015-11-09 00:00:00\"},{\"date\":\"2015-11-16 00:00:00\",\"value\":29885}]}]}", record.getValue().asString());
+		try {
+			assertEquals(handler.getTimeWrapper().getTime(), record.getTimestamp());
+			
 		} catch (ParseException e) {
 			assertTrue(e.getMessage(), false);
 		}
-         assertEquals(Flag.VALID, rec.getFlag());
+		assertEquals(Flag.VALID, record.getFlag());
 	}
-	
+
 	@Test
 	public void testEnergyDetailsJsonGetProductionValue0() {
-        String testMethodName = "testEnergyDetailsJsonGetProductionValue0";
-        System.out.println(testMethodName);
-
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler) connection.getHandler();
-		} catch (Exception e) {
-			assertTrue(e.getMessage(), false);
-			return;
-		}
-        
-        Record rec;
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
 		try {
-			rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[0].value", 
-						"$.energyDetails.meters[?(@.type=='Production')].values[0].date", 
-						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
+		
+		Record record;
+		try {
+			record = connection.getTestRecord("$.energyDetails.meters[?(@.type=='Production')].values[0].value", 
+						"$.energyDetails.meters[?(@.type=='Production')].values[0].date", 
+						SolarEdge.QUARTER_OF_AN_HOUR, null);
+			
+		} catch (Exception e) {
+			assertTrue(e.getMessage(), false);
+			return;
+		}
+		
+		TestHandler responseHandler = connection.getHandler();;
  		HttpRequest request = responseHandler.getRequest();
 		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, SolarEdgeConst.QUARTER_OF_AN_HOUR, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = responseHandler.fillRequest(requestResult, SolarEdge.QUARTER_OF_AN_HOUR, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", responseHandler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", responseHandler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, SolarEdgeConst.QUARTER_OF_AN_HOUR);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = responseHandler.fillParameters(PARAMETERS, SolarEdge.QUARTER_OF_AN_HOUR);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals(null, rec.getValue().asString());
-		assertEquals("2015-10-19 00:00:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.NO_VALUE_RECEIVED_YET, rec.getFlag());
+		assertEquals("2015-10-19 00:00:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals(null, record.getValue().asString());
+		assertEquals(Flag.NO_VALUE_RECEIVED_YET, record.getFlag());
 	}
-	
+
 	@Test
 	public void testEnergyDetailsJsonGetProductionValue1() {
-        String testMethodName = "testEnergyDetailsJsonGetProductionValue1";
-        System.out.println(testMethodName);
-
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-        
-        Record rec;
+		
+		Record record;
 		try {
-			rec = connection.getRecordForTest("$.energyDetails.meters[?(@.type=='Production')].values[1].value", 
+			record = connection.getTestRecord("$.energyDetails.meters[?(@.type=='Production')].values[1].value", 
 						"$.energyDetails.meters[?(@.type=='Production')].values[1].date", 
-						SolarEdgeConst.QUARTER_OF_AN_HOUR, null);
+						SolarEdge.QUARTER_OF_AN_HOUR, null);
+			
 		} catch (Exception e) {
 			assertTrue(e.getMessage(), false);
 			return;
 		}
-		HttpRequest request = responseHandler.getRequest();
-		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
-			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, SolarEdgeConst.QUARTER_OF_AN_HOUR, 
-					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, SolarEdgeConst.QUARTER_OF_AN_HOUR);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
-			}
-		} catch (UnsupportedEncodingException e) {
-			assertTrue(e.getMessage(), false);
-		}
-        assertEquals(null, rec.getValue().asString());
- 		assertEquals("2015-10-26 00:00:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.NO_VALUE_RECEIVED_YET, rec.getFlag());
-	}
-	
-	@Test
-    public void testEnergyDetailsJsonGetProductionValueLast() {
-        String testMethodName = "testEnergyDetailsJsonGetProductionValueLast";
-        System.out.println(testMethodName);
 
-        TestDriver driver = new TestDriver(jsonConnectString, jsonString);
-        TestHandler responseHandler = null;
-        TestConnection connection = null;
-        try {
-        	connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
-        	responseHandler = (TestHandler)connection.getHandler();
-		} catch (Exception e) {
-			assertTrue(e.getMessage(), false);
-			return;
-		}
-        
-        Record rec;
+		TestHandler handler = connection.getHandler();;
+		HttpRequest request = handler.getRequest();
 		try {
-			rec = connection.getRecordForTest("energyDetails Production", "timeUnit="+SolarEdgeConst.QUARTER_OF_AN_HOUR);
-		} catch (Exception e) {
-			assertTrue(e.getMessage(), false);
-			return;
-		}
-		HttpRequest request = responseHandler.getRequest();
-		try {
-			String requestStr = request.getRequest(CHARSET); 
-			System.out.println(requestStr);
 			DeviceAddress address = driver.getDeviceAddress();
-			String resultRequest = address.getAddress() + "/site/" + address.getSiteId() + "/" + API;
-			resultRequest = responseHandler.fillRequest(resultRequest, SolarEdgeConst.QUARTER_OF_AN_HOUR, 
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = handler.fillRequest(requestResult, SolarEdge.QUARTER_OF_AN_HOUR, 
 					driver.getDeviceSettings().getAuthentication());
-			assertEquals(resultRequest, requestStr);
-			String format = responseHandler.getTimeWrapper().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
-			format = responseHandler.getLastTime().getFormat();
-			assertEquals("yyyy-MM-dd HH:mm:ss", format);
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", handler.getLastTime().getFormat());
+			
 			if (request.getParameters() != null) {
-				String params = responseHandler.fillParameters(PARAMETERS, SolarEdgeConst.QUARTER_OF_AN_HOUR);
-				String requestParams = request.parseParameters(CHARSET);
-				assertEquals(params, requestParams);
-				System.out.println(requestParams);
+				String parameters = handler.fillParameters(PARAMETERS, SolarEdge.QUARTER_OF_AN_HOUR);
+				assertEquals(parameters, request.parseParameters(CHARSET));
 			}
 		} catch (UnsupportedEncodingException e) {
 			assertTrue(e.getMessage(), false);
 		}
-        assertEquals(2953, rec.getValue().asInt());
- 		assertEquals("2015-11-16 00:00:00", new TimeWrapper(rec.getTimestamp(), SolarEdgeConst.TIME_FORMAT, ZONE).getTimeStr());
-        assertEquals(Flag.VALID, rec.getFlag());
-    }
+		assertEquals(null, record.getValue().asString());
+ 		assertEquals("2015-10-26 00:00:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals(Flag.NO_VALUE_RECEIVED_YET, record.getFlag());
+	}
+
+	@Test
+	public void testEnergyDetailsJsonGetProductionValueLast() {
+		TestDriver driver = new TestDriver(jsonConnectString, jsonString);
+		TestConnection connection = null;
+		try {
+			connection = (TestConnection) driver.connect(ADDRESS, SETTINGS);
+			
+		} catch (Exception e) {
+			assertTrue(e.getMessage(), false);
+			return;
+		}
+		
+		Record record;
+		try {
+			record = connection.getTestRecord("energyDetails Production", "timeUnit="+SolarEdge.QUARTER_OF_AN_HOUR);
+			
+		} catch (Exception e) {
+			assertTrue(e.getMessage(), false);
+			return;
+		}
+		
+		TestHandler responseHandler = connection.getHandler();
+		HttpRequest request = responseHandler.getRequest();
+		try {
+			DeviceAddress address = driver.getDeviceAddress();
+			String requestResult = address.getAddress() + "site/" + address.getSiteId() + "/" + API;
+			requestResult = responseHandler.fillRequest(requestResult, SolarEdge.QUARTER_OF_AN_HOUR, 
+					driver.getDeviceSettings().getAuthentication());
+			
+			assertEquals(requestResult, request.toString(CHARSET));
+			assertEquals("yyyy-MM-dd HH:mm:ss", responseHandler.getTimeWrapper().getFormat());
+			assertEquals("yyyy-MM-dd HH:mm:ss", responseHandler.getLastTime().getFormat());
+			
+			if (request.getParameters() != null) {
+				String parameters = responseHandler.fillParameters(PARAMETERS, SolarEdge.QUARTER_OF_AN_HOUR);
+				assertEquals(parameters, request.parseParameters(CHARSET));
+			}
+		} catch (UnsupportedEncodingException e) {
+			assertTrue(e.getMessage(), false);
+		}
+ 		assertEquals("2015-11-16 00:00:00", new TimeWrapper(record.getTimestamp(), SolarEdge.TIME_FORMAT, ZONE).getTimeStr());
+		assertEquals(2953, record.getValue().asInt());
+		assertEquals(Flag.VALID, record.getFlag());
+	}
 }

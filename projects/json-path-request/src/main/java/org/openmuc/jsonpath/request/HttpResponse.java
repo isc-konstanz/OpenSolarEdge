@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -17,12 +17,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.jsonpath.request.json;
+package org.openmuc.jsonpath.request;
 
 import java.text.ParseException;
 import java.util.TimeZone;
 
-import org.openmuc.jsonpath.com.HttpGeneralException;
+import org.openmuc.jsonpath.HttpException;
 import org.openmuc.jsonpath.data.TimeConverter;
 import org.openmuc.jsonpath.data.TimeValue;
 
@@ -31,62 +31,46 @@ import com.jayway.jsonpath.JsonPath;
 
 import net.minidev.json.JSONArray;
 
-public class JsonResponse {
+public class HttpResponse {
 
-	protected final DocumentContext jsonContext;
-	protected final String response;
+	protected final DocumentContext json;
 
-	public JsonResponse(String response) {
-		this.response = response;
-		this.jsonContext = JsonPath.parse(response);
+	public HttpResponse(String response) {
+		this.json = JsonPath.parse(response);
 	}
-	
-	public String getResponse() {
-		return response;
-	}
-	
-	public TimeValue getTimeValueWithTimePath(String valuePath, String timePath, String timeFormat, TimeZone timeZone) throws ParseException, HttpGeneralException {
-		Long time = getTimeFromJson(timePath, timeFormat, timeZone);
+
+	public TimeValue getTimeValue(String valuePath, String timePath, String timeFormat, TimeZone timeZone) throws ParseException, HttpException {
+		Long time = getTime(timePath, timeFormat, timeZone);
 		Object val = getValue(valuePath);
-		return getTimeValuePair(val, time);
+		return getTimeValue(val, time);
 	}
-	
-	public TimeValue getTimeValueWithTime(String valuePath, Long time) throws HttpGeneralException {
-		Object val = getValue(valuePath);
+
+	public TimeValue getTimeValue(String path, Long time) throws HttpException {
+		Object val = getValue(path);
 		Long myTime= System.currentTimeMillis();
 		if (time != null) {
 			long endTime = time;
 			if (endTime < myTime) myTime = endTime;
 		}
-		return getTimeValuePair(val, myTime);
+		return getTimeValue(val, myTime);
 	}
-	
-	protected TimeValue getTimeValuePair(Object val, Long time) {
+
+	protected TimeValue getTimeValue(Object val, Long time) {
 		return new TimeValue(val, time);		
 	}
-	
-	public Object getValue(String path) throws HttpGeneralException {
+
+	public Object getValue(String path) throws HttpException {
 		Object obj = null;
 		try {
-			obj = jsonContext.read(path);
+			obj = json.read(path);
 		}
 		catch (Exception e) {
 			RuntimeException re = new RuntimeException(e);
-			throw new HttpGeneralException("Read path " + path + " failed: " + e, re);
+			throw new HttpException("Read path " + path + " failed: " + e, re);
 		}
 		return getValue(obj);
 	}
-	
-	public Long getTimeFromJson(String path, String format, TimeZone zone) throws ParseException {
-		Object obj = jsonContext.read(path);
-		if (obj instanceof JSONArray) {
-			obj = ((JSONArray)obj).get(0).toString();
-		}
-		Long time = null;
-		time = TimeConverter.decode(obj.toString(), format, zone);
-		return time;
-	}
-	
+
 	protected Object getValue(Object obj) {
 		if (obj instanceof JSONArray) {
 			return getValue((JSONArray)obj);
@@ -102,7 +86,7 @@ public class JsonResponse {
 		}
 		return obj;
 	}
-	
+
 	protected Object getValue(JSONArray arr) {
 		Object val = null;
 		
@@ -115,4 +99,20 @@ public class JsonResponse {
 		
 		return val;
 	}
+
+	public Long getTime(String path, String format, TimeZone zone) throws ParseException {
+		Object obj = json.read(path);
+		if (obj instanceof JSONArray) {
+			obj = ((JSONArray)obj).get(0).toString();
+		}
+		Long time = null;
+		time = TimeConverter.decode(obj.toString(), format, zone);
+		return time;
+	}
+
+	@Override
+	public String toString() {
+		return json.jsonString();
+	}
+
 }

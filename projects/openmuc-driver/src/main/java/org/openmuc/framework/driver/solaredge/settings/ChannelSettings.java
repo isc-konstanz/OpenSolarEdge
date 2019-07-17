@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -21,14 +21,14 @@ package org.openmuc.framework.driver.solaredge.settings;
 
 import org.openmuc.framework.config.PreferenceType;
 import org.openmuc.framework.config.Preferences;
-import org.openmuc.solaredge.config.SolarEdgeConst;
+import org.openmuc.solaredge.SolarEdge;
 
 public class ChannelSettings extends Preferences {
 
     public static final PreferenceType TYPE = PreferenceType.SETTINGS_CHANNEL;
 
     @Option
-    private String timeUnit = SolarEdgeConst.QUARTER_OF_AN_HOUR;
+    private String timeUnit = SolarEdge.QUARTER_OF_AN_HOUR;
 
     @Option
     private String serialNumber;
@@ -39,7 +39,7 @@ public class ChannelSettings extends Preferences {
     }
 
     public String getValuePath(String address) {
-    	String path = SolarEdgeConst.REQUEST_VALUE_PATH_MAP.get(address);
+    	String path = SolarEdge.REQUEST_PATH_VALUES.get(address);
     	switch (address) {
     		case "storageData power" :
     		case "storageData batteryState" :
@@ -56,7 +56,7 @@ public class ChannelSettings extends Preferences {
     }
 
     public String getTimePath(String address) {
-    	String path = SolarEdgeConst.REQUEST_TIME_PATH_MAP.get(address);
+    	String path = SolarEdge.REQUEST_PATH_TIMES.get(address);
     	switch (address) {
     		case "storageData power" :
     		case "storageData batteryState" :

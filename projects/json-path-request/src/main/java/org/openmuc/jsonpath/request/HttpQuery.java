@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -22,80 +22,82 @@ package org.openmuc.jsonpath.request;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.openmuc.jsonpath.request.json.ToJsonObject;
+public class HttpQuery extends LinkedHashMap<String, String>{
+	private static final long serialVersionUID = 7622558815668412483L;
 
-public class HttpRequestParameters extends LinkedHashMap<String, String> {
-	
-	private static final long serialVersionUID = 4688227144913816378L;
+	private final String query;
 
-	public HttpRequestParameters() {
+	private HttpQuery(String query) {
 		super();
+		this.query = query;
 	}
-	
-	public void addParameter(String key, ToJsonObject value) {
+
+	public HttpQuery() {
+		this("");
+	}
+
+	public HttpQuery(String ... q) {
+		this(String.join("/", q));
+	}
+
+	public void addParameter(String key, JsonBuilder value) {
 		super.put(key, value.toString());
 	}
-	
+
 	public void addParameter(String key, String value) {
 		super.put(key, value);
 	}
-	
+
 	public void addParameter(String key, double value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, long value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, int value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, boolean value) {
 		super.put(key, String.valueOf(value));
 	}
-	
-	public String parseParameters(Charset charset) throws UnsupportedEncodingException {
-		StringBuilder parameterListBuilder = new StringBuilder();
 
+	public String parse(Charset charset) throws UnsupportedEncodingException {
+		StringBuilder uriBuilder = new StringBuilder();
+		uriBuilder.append(query);
+		if (size() > 0) {
+			uriBuilder.append('?');
+		}
+		
 		Iterator<Map.Entry<String, String>> iteratorParameterList = super.entrySet().iterator();
 		while (iteratorParameterList.hasNext()) {
 			Map.Entry<String, String> parameter = iteratorParameterList.next();
 			
-			parameterListBuilder.append(URLEncoder.encode(parameter.getKey(), charset.name()));
-			parameterListBuilder.append('=');
-			parameterListBuilder.append(URLEncoder.encode(parameter.getValue(), charset.name()));
-
+			uriBuilder.append(URLEncoder.encode(parameter.getKey(), charset.name()));
+			uriBuilder.append('=');
+			uriBuilder.append(URLEncoder.encode(parameter.getValue(), charset.name()));
+			
 			if (iteratorParameterList.hasNext()) {
-				parameterListBuilder.append('&');
+				uriBuilder.append('&');
 			}
 		}
-		
-		return parameterListBuilder.toString();
+		return uriBuilder.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder parameterListBuilder = new StringBuilder();
-
-		Iterator<Map.Entry<String, String>> iteratorParameterList = super.entrySet().iterator();
-		while (iteratorParameterList.hasNext()) {
-			Map.Entry<String, String> parameter = iteratorParameterList.next();
+		try {
+			return parse(StandardCharsets.UTF_8);
 			
-			parameterListBuilder.append(parameter.getKey());
-			parameterListBuilder.append('=');
-			parameterListBuilder.append(parameter.getValue());
-
-			if (iteratorParameterList.hasNext()) {
-				parameterListBuilder.append('&');
-			}
+		} catch (UnsupportedEncodingException e) {
 		}
-		
-		return parameterListBuilder.toString();
+		return null;
 	}
 }

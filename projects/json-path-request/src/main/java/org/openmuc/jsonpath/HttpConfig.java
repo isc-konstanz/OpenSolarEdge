@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -17,9 +17,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with OpenSolarEdge.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.openmuc.jsonpath.request;
+package org.openmuc.jsonpath;
 
+public class HttpConfig {
 
-public enum HttpRequestMethod {
-	GET, POST, PUT, DELETE;
+	public final static int MAX_THREADS_DEFAULT = 1;
+
+	private String url;
+	private String apiKey;
+	private int maxThreads = 1;
+
+	public HttpConfig(String url, String apiKey) {
+		this.url = url;
+		this.apiKey = apiKey;
+	}
+
+	public HttpConfig(String url, String apiKey, int maxThreads) {
+		this.url = url;
+		this.apiKey = apiKey;
+		this.maxThreads = maxThreads;
+	}
+
+	public String getAddress() {
+		return url;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public int getMaxThreads() {
+		if (maxThreads > 0) {
+			return maxThreads;
+		}
+		return MAX_THREADS_DEFAULT;
+	}
 }

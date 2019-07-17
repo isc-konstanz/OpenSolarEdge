@@ -1,5 +1,5 @@
 /* 
- * Copyright 2016-18 ISC Konstanz
+ * Copyright 2016-19 ISC Konstanz
  * 
  * This file is part of OpenSolarEdge.
  * For more information visit https://github.com/isc-konstanz/OpenSolarEdge
@@ -22,92 +22,67 @@ package org.openmuc.jsonpath.request;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.openmuc.jsonpath.request.json.ToJsonObject;
+public class HttpParameters extends LinkedHashMap<String, String> {
+	private static final long serialVersionUID = 8225350318869217570L;
 
-
-public class HttpRequestAction extends LinkedHashMap<String, String>{
-	private static final long serialVersionUID = 7622558815668412483L;
-	
-	private final String action;
-	
-	public HttpRequestAction(String action) {
+	public HttpParameters() {
 		super();
-		
-		this.action = action;
 	}
-	
-	public void addParameter(String key, ToJsonObject value) {
+
+	public void addParameter(String key, JsonBuilder value) {
 		super.put(key, value.toString());
 	}
-	
+
 	public void addParameter(String key, String value) {
 		super.put(key, value);
 	}
-	
+
 	public void addParameter(String key, double value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, long value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, int value) {
 		super.put(key, String.valueOf(value));
 	}
-	
+
 	public void addParameter(String key, boolean value) {
 		super.put(key, String.valueOf(value));
 	}
-	
-	public String parseAction(Charset charset) throws UnsupportedEncodingException {
-		StringBuilder actionBuilder = new StringBuilder();
-		actionBuilder.append(action);
-		if (size() > 0) {
-			actionBuilder.append('?');
-		}
+
+	public String parse(Charset charset) throws UnsupportedEncodingException {
+		StringBuilder parameterListBuilder = new StringBuilder();
 		
 		Iterator<Map.Entry<String, String>> iteratorParameterList = super.entrySet().iterator();
 		while (iteratorParameterList.hasNext()) {
 			Map.Entry<String, String> parameter = iteratorParameterList.next();
 			
-			actionBuilder.append(URLEncoder.encode(parameter.getKey(), charset.name()));
-			actionBuilder.append('=');
-			actionBuilder.append(URLEncoder.encode(parameter.getValue(), charset.name()));
-
+			parameterListBuilder.append(URLEncoder.encode(parameter.getKey(), charset.name()));
+			parameterListBuilder.append('=');
+			parameterListBuilder.append(URLEncoder.encode(parameter.getValue(), charset.name()));
+			
 			if (iteratorParameterList.hasNext()) {
-				actionBuilder.append('&');
+				parameterListBuilder.append('&');
 			}
 		}
-		
-		return actionBuilder.toString();
+		return parameterListBuilder.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder actionBuilder = new StringBuilder();
-		actionBuilder.append(action);
-		if (size() > 0) {
-			actionBuilder.append('?');
-		}
-
-		Iterator<Map.Entry<String, String>> iteratorParameterList = super.entrySet().iterator();
-		while (iteratorParameterList.hasNext()) {
-			Map.Entry<String, String> parameter = iteratorParameterList.next();
+		try {
+			return parse(StandardCharsets.UTF_8);
 			
-			actionBuilder.append(parameter.getKey());
-			actionBuilder.append('=');
-			actionBuilder.append(parameter.getValue());
-
-			if (iteratorParameterList.hasNext()) {
-				actionBuilder.append('&');
-			}
+		} catch (UnsupportedEncodingException e) {
 		}
-		
-		return actionBuilder.toString();
+		return null;
 	}
 }
